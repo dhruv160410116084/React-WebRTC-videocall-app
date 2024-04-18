@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import User from './User'
 
-let user = ["Dhruv","Dvarc","Deathstar","R2D2","AP", "Jheel bhindu"]
+let user = ["Dhruv","Dvarc","Deathstar","R2D2","AP", "Jheel"]
 
 function UserList(props){
 

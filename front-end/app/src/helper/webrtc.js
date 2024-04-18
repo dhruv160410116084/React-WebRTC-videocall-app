@@ -1,6 +1,6 @@
  export async function playVideoFromCamera(){
     try {
-        const constraints = {'video':false}
+        const constraints = {'video':true}
         const stream = await navigator.mediaDevices.getUserMedia(constraints)
         return stream
     } catch (error) {
