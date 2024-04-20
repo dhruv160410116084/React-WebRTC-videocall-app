@@ -9,6 +9,7 @@ export default function Lobby(porps) {
  
   const videoRef = useRef(null)
 
+
   function handleVideo(){
     console.log(videoRef)
 
@@ -18,24 +19,29 @@ export default function Lobby(porps) {
    })
   }
 
+  useEffect(()=> {
+    handleVideo()
+  })
+
   return (
     <div className="flex flex-col">
       <NavBar />
       <div className='flex flex-row'>
-        <div className='justifiy-self-auto mx-3 '>
+        <div className='justifiy-self-auto mx-8 '>
           <UserList className="p-3 text-left" />
           <button className="bg-red-500 w-full text-white">Exit</button>
         </div>
         {/* <Video ></Video> */}
+        <div className="flex flex-col">
         <video ref={videoRef} autoPlay playsInline></video>
-        <button onClick={handleVideo}>get video</button>
+        <video autoPlay playsInline></video>
+
+        </div>
+        
+        {/* <button onClick={handleVideo}>get video</button> */}
 
       </div>
       </div>
-      
-
-
-
   )
 }
 
