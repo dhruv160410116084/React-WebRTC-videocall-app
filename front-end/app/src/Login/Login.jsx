@@ -21,7 +21,9 @@ export default function Login() {
         //     // stream = data;
         //     // setStream(data)
         //     console.log("in use effect")
-        navigator("/lobby")
+        navigator("/lobby",{
+            state:{userName:userName}
+        })
 
         //  })
     }

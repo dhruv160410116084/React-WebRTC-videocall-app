@@ -8,6 +8,7 @@ import { useLocation } from "react-router-dom";
 export default function Lobby(porps) {
  
   const videoRef = useRef(null)
+  const [stream,setStream] = useState();
 
 
   function handleVideo(){
@@ -15,13 +16,35 @@ export default function Lobby(porps) {
 
     playVideoFromCamera().then(data => {
       console.log(videoRef)
+      setStream(data)
       videoRef.current.srcObject =data;
    })
   }
 
+  function handleStop(){
+    if(stream) {
+      // console.log(videoRef.current.srcObject,videoRef.current.srcObject.getTracks())
+      console.log('inside if candition')
+      stream.getTracks().forEach(t => t.stop())
+
+    }
+  }
+
   useEffect(()=> {
+    console.log("on mount --------------------")
     handleVideo()
-  })
+    debugger
+    return function () {
+      console.log("on unmount ------------------")
+      console.log(stream) 
+      if(stream) {
+        // console.log(videoRef.current.srcObject,videoRef.current.srcObject.getTracks())
+        stream.getTracks().forEach(t => t.stop())
+
+      }
+    
+    }
+  },[])
 
   return (
     <div className="flex flex-col">
@@ -34,8 +57,8 @@ export default function Lobby(porps) {
         {/* <Video ></Video> */}
         <div className="flex flex-col">
         <video ref={videoRef} autoPlay playsInline></video>
-        <video autoPlay playsInline></video>
-
+        {/* <video autoPlay playsInline></video> */}
+        <button onClick={handleStop}>Stop</button>
         </div>
         
         {/* <button onClick={handleVideo}>get video</button> */}

@@ -17,6 +17,7 @@ function UserList(props){
                     return  <div className='flex flex-row p-2 px-4 justify-between hover:bg-slate-500 '>
                     <User data={u} />
                     <img src={meetingLogo} onClick={handleOnClick} className='hover:cursor-pointer'></img>
+                    
                     </div>
                     
                 })

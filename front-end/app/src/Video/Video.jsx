@@ -1,5 +1,5 @@
 import {playVideoFromCamera} from '../helper/webrtc'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 
  function Video(props){
@@ -7,6 +7,10 @@ import { useState } from 'react';
     // const [stream,setStream] = useState(null)
 
     // playVideoFromCamera().then(stream => setStream(stream))
+
+    useEffect(() => {
+      return 
+    })
     function handleVideo(){
         console.log(videoRef)
     
