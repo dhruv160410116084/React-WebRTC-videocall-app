@@ -4,6 +4,8 @@ import UserList from "../Users/UserList";
 import Video from "../Video/Video";
 import { playVideoFromCamera } from "../helper/webrtc";
 import { useLocation } from "react-router-dom";
+import { io } from 'socket.io-client';
+
 
 export default function Lobby(porps) {
  
@@ -25,21 +27,34 @@ export default function Lobby(porps) {
     if(stream) {
       // console.log(videoRef.current.srcObject,videoRef.current.srcObject.getTracks())
       console.log('inside if candition')
+      console.log(stream.getTracks())
       stream.getTracks().forEach(t => t.stop())
-
+      videoRef.current.srcObject =null;
     }
   }
 
   useEffect(()=> {
     console.log("on mount --------------------")
     handleVideo()
-    debugger
+    const socket = io('http://localhost:3000')
+    console.log(socket)
+    socket.on('connection',(data)=>{
+      console.log("connected to server")
+    })
+    // debugger
     return function () {
+      if(socket){
+        socket.close()
+      }
       console.log("on unmount ------------------")
       console.log(stream) 
       if(stream) {
         // console.log(videoRef.current.srcObject,videoRef.current.srcObject.getTracks())
-        stream.getTracks().forEach(t => t.stop())
+        socket.disconnect()
+        stream.getTracks().forEach(t => {
+          t.stop()
+          t.enabled = false;
+        })
 
       }
     
@@ -59,6 +74,8 @@ export default function Lobby(porps) {
         <video ref={videoRef} autoPlay playsInline></video>
         {/* <video autoPlay playsInline></video> */}
         <button onClick={handleStop}>Stop</button>
+        <button onClick={handleVideo}>Start</button>
+
         </div>
         
         {/* <button onClick={handleVideo}>get video</button> */}
