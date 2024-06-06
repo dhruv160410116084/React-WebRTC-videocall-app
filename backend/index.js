@@ -28,12 +28,14 @@ io.on("connection", (socket) => {
       console.log(socket.id, " connected")
       users[socket.id] = ""
       socket.on('user-data', (data) => {
+        console.log("user-data",data)
         users[socket.id] = data
         io.emit('users', users)
   
       })
   
       socket.on('offer', (data) => {
+        console.log("offer ",data)
         // socket.broadcast.emit('offer', data)
         data.sender = socket.id
         io.to(data.member).emit('offer', data)
@@ -41,6 +43,7 @@ io.on("connection", (socket) => {
   
       socket.on('answer', (data) => {
         // socket.broadcast.emit('answer', data)
+        console.log('answer: -------------------- ', data)
         io.to(data.receiver).emit('answer', data)
       })
   

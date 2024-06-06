@@ -37,7 +37,7 @@ function App() {
       {/* <h1>Hello</h1> */}
       
       <div className='h-full flex flex-col items-center'>
-      <div class="cube 	 "></div>
+      <div className="cube 	 "></div>
       <Login></Login>
 
       </div>

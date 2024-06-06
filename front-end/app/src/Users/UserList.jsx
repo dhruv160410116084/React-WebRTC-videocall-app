@@ -1,9 +1,33 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import User from './User'
-import meetingLogo from '../assets/call.svg'
-let user = ["Dhruv","Dvarc","Deathstar","R2D2","AP", "Jheel"]
+import { io } from 'socket.io-client';
+import { socket } from '../socket';
+// import { socket } from '../socket';
+// let user = ["Dhruv","Dvarc","Deathstar","R2D2","AP", "Jheel"]
+
+
+async function setRemoteDescription(){
+
+}
 
 function UserList(props){
+
+    const [userList,setUserList] = useState([]);
+
+    useEffect(()=>{
+        console.log(props.socket.connected)
+        props.socket.emit('get-users');
+        props.socket.on('users',function (data){
+            console.log("users from server -------------------")
+            console.log(data)
+          data=  Object.keys(data).map(key =>  {
+              return   {socketId:key, userName:data[key]}
+            
+            }).filter(v => v.socketId !== socket.id)
+            console.log(data)
+            setUserList(data)
+        })
+    },[])
     function handleOnClick(){
         console.log("hello")
     }
@@ -13,10 +37,10 @@ function UserList(props){
          <h2 className=' text-2xl text-center'>  <b>Users</b> </h2>  
 
             {
-                user.map(u => {
-                    return  <div className='flex flex-row p-2 px-4 justify-between hover:bg-slate-500 '>
-                    <User data={u} />
-                    <img src={meetingLogo} onClick={handleOnClick} className='hover:cursor-pointer'></img>
+                userList.map(u => {
+                    return  <div className=''>
+                    <User data={u} makeCall={props.makeCall} />
+                    
                     
                     </div>
                     
