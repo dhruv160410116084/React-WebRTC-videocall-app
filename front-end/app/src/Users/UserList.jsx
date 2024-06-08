@@ -15,16 +15,16 @@ function UserList(props){
     const [userList,setUserList] = useState([]);
 
     useEffect(()=>{
-        console.log(props.socket.connected)
+        // console.log(props.socket.connected)
         props.socket.emit('get-users');
         props.socket.on('users',function (data){
-            console.log("users from server -------------------")
-            console.log(data)
+           
+            
           data=  Object.keys(data).map(key =>  {
               return   {socketId:key, userName:data[key]}
             
             }).filter(v => v.socketId !== socket.id)
-            console.log(data)
+            // console.log(data)
             setUserList(data)
         })
     },[])
@@ -38,8 +38,8 @@ function UserList(props){
 
             {
                 userList.map(u => {
-                    return  <div className=''>
-                    <User data={u} makeCall={props.makeCall} />
+                    return  <div className='' key={u.socketId}>
+                    <User  data={u} makeCall={props.makeCall} />
                     
                     
                     </div>

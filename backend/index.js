@@ -5,7 +5,7 @@ const cors = require('cors');
 const app = express();
 const server = createServer(app)
 const io = new Server(server,{
-    cors:['http://localhost:5173']
+    cors:['http://localhost:5173',' http://192.168.2.17:5173/']
 })
 
 
