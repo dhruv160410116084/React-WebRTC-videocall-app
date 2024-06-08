@@ -48,7 +48,7 @@ io.on("connection", (socket) => {
       })
   
       socket.on('candidate', (data) => {
-        socket.broadcast.emit('candidate', data)
+        io.to(data.receiver).emit('candidate', data)
       })
   
       socket.on('get-users', async (data) => {

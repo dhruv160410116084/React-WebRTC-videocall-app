@@ -11,6 +11,7 @@ const configuration = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' 
 let count = 0
 let pc;
 let localStream;
+let remoteSocketId=null;
 
 export default function Lobby(props) {
   const videoRef = useRef(null)
@@ -43,7 +44,7 @@ export default function Lobby(props) {
     pc.onicecandidate = e => {
       console.log("Ice candidate: ", e.candidate)
       if (e.candidate) {
-        socket.emit('candidate', { 'candidate': e.candidate });
+        socket.emit('candidate', { receiver:remoteSocketId,'candidate': e.candidate });
       }
     };
     pc.ontrack = e => {
@@ -168,6 +169,7 @@ export default function Lobby(props) {
 
 
   async function makeCall(member) {
+    remoteSocketId=member
     await createConnection();
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
