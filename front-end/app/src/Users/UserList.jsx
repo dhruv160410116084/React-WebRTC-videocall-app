@@ -37,14 +37,14 @@ function UserList(props){
          <h2 className=' text-2xl text-center'>  <b>Users</b> </h2>  
 
             {
-                userList.map(u => {
+               userList.length > 0 ? userList.map(u => {
                     return  <div className='' key={u.socketId}>
                     <User  data={u} makeCall={props.makeCall} />
                     
                     
                     </div>
                     
-                })
+                }) : <h2 className='text-center my-2'>No Online users</h2>
             }
         </div>
     )

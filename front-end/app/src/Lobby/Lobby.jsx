@@ -4,6 +4,7 @@ import UserList from "../Users/UserList";
 import { playVideoFromCamera } from "../helper/webrtc";
 import { useLocation } from "react-router-dom";
 import { socket } from "../socket";
+import MediaControl from "../MediaControl";
 
 const configuration = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
 let pc = null;
@@ -121,18 +122,18 @@ export default function Lobby(props) {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="h-dvh w-full flex flex-col">
       <NavBar userName={location.state.userName} />
-      <div className='flex flex-row'>
-        <div className='justifiy-self-auto mx-8 '>
+      <div className='flex flex-row w-full'>
+        <div className='w-1/5 justifiy-self-auto mx-8 '>
           <UserList className="p-3 text-left" socket={socket} makeCall={makeCall} />
-          <button className="bg-red-500 w-full text-white">Exit</button>
         </div>
-        <div className="flex flex-row">
+        <div className="w-4/5 flex flex-row justify-center bg-gray-200">
           <video ref={videoRef} autoPlay playsInline></video>
-          <video autoPlay playsInline ref={remoteVideoRef}></video>
+          <video autoPlay playsInline ref={remoteVideoRef} className="hidden"></video>
         </div>
       </div>
+      <MediaControl/>
     </div>
   );
 }
