@@ -91,6 +91,7 @@ export default function Lobby(props) {
       pc.onconnectionstatechange = () => {
         if (pc.connectionState === 'connected') {
           console.log('Peers connected');
+          remoteVideoRef.current.className='block'
         }
       };
 
@@ -133,7 +134,10 @@ export default function Lobby(props) {
           <video autoPlay playsInline ref={remoteVideoRef} className="hidden"></video>
         </div>
       </div>
-      <MediaControl/>
+      <div className="self-center">
+      <MediaControl />
+
+      </div>
     </div>
   );
 }

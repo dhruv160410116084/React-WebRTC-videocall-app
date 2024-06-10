@@ -9,3 +9,12 @@
         console.error('Error opening video camera.',error)
     }
 }
+
+export async function listMedia(){
+    try {
+        const list = await navigator.mediaDevices.enumerateDevices();
+        return list
+    } catch (error) {
+        console.log(error)
+    }
+}
