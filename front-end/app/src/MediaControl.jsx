@@ -6,7 +6,7 @@ import MicrophoneOnIcon from './assets/microphone.svg';
 import MicrophoneOffIcon from './assets/microphone-slash.svg';
 import { listMedia, playVideoFromCamera } from './helper/webrtc';
 
-export default function MediaControl({ cleanup, localStream, handleVideo, pc, className, remotePc, videoElemRef, isCamOn, setIsCamOn, isMicOn, setIsMicOn }) {
+export default function MediaControl({ cleanup, localStream, handleVideo, pc, className, remotePc, videoElemRef, isCamOn, setIsCamOn, isMicOn, setIsMicOn,isOnCall }) {
   const CameraIconRef = useRef(null);
   const MicrophoneIconRef = useRef(null);
   
@@ -17,8 +17,8 @@ export default function MediaControl({ cleanup, localStream, handleVideo, pc, cl
     listMedia().then(list => {
       list = list.filter(e => e.kind === 'videoinput')
       setVideoInputList(list);
-      console.log(list[0])
-      console.log('localstream: ',localStream)
+      // console.log(list[0])
+      // console.log('localstream: ',localStream)
       if(localStream){
         setCamera(list.find((e) => {
           return e.deviceId === localStream.getVideoTracks()[0].getCapabilities().deviceId
@@ -31,7 +31,7 @@ export default function MediaControl({ cleanup, localStream, handleVideo, pc, cl
   }, [localStream,isCamOn,isMicOn]);
 
   useEffect(() => {
-    console.log('PeerConnection or localStream changed', pc, localStream);
+    // console.log('PeerConnection or localStream changed', pc, localStream);
   }, [pc]);
 
   const handleCamera = async () => {
@@ -68,13 +68,13 @@ export default function MediaControl({ cleanup, localStream, handleVideo, pc, cl
         }
       } else {
         // Turning the camera off
-        console.log('in camera off code',setIsCamOn,videoTracks)
+        // console.log('in camera off code',setIsCamOn,videoTracks)
         CameraIconRef.current.src = CameraOffIcon;
         // videoElemRef.current.src = ""
         // videoElemRef.current.currentTime=0;
 
         videoTracks.forEach(track => {
-          console.log('in if tracks')
+          // console.log('in if tracks')
           track.enabled = false;
           // if (pc) {
           //   const sender = pc.getSenders().find(s => s.track === track);
@@ -130,7 +130,10 @@ export default function MediaControl({ cleanup, localStream, handleVideo, pc, cl
       <button className='bg-gray-400 hover:bg-cyan-400 mx-1' onClick={handleMicrophone}>
         <img className='h-5' src={MicrophoneOnIcon} alt="Microphone Toggle" ref={MicrophoneIconRef} />
       </button>
-      <img src={CallEndIcon} className="h-10 hover:cursor-pointer" alt="End Call" onClick={handleCallEnd} />
+      {
+        isOnCall && <img src={CallEndIcon} className="h-10 hover:cursor-pointer" alt="End Call" onClick={handleCallEnd} />
+      }
+      
     </div>
   );
 }

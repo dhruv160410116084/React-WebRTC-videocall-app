@@ -10,11 +10,14 @@ export default function User(props) {
     }
     return (
         <div key={props.data.socketId}
-            className='flex flex-row p-2 px-4 justify-between hover:bg-slate-400 hover:cursor-pointer hover:text-white'
+            className={`flex flex-row p-2 px-4 hover:bg-slate-400  hover:text-white justify-between`  }
            >
-                <img src={props.data.profile} className='h-10'></img>
-            <h2 className="p-1 text-xl" id={props.data.socketId}>{props.data.userName}</h2>
-            {props.tab === 1 &&  <img src={meetingLogo} className=''  onClick={handleOnClick} ></img> }
+            <div className='flex flex-row'>
+            <img src={props.data.profile} className='h-10'></img>
+            <h2 className="p-1 text-xl mx-0.5" id={props.data.socketId}>{props.data.userName}</h2>
+            </div>
+                
+            {props.tab === 1 &&  <img src={meetingLogo} className='hover:cursor-pointer'  onClick={handleOnClick} ></img> }
         </div>
 
     )

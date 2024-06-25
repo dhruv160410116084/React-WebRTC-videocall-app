@@ -6,12 +6,12 @@ const bodyParser = require('body-parser')
 const app = express();
 const server = createServer(app)
 const io = new Server(server,{
-    cors:['http://localhost:5173',' http://192.168.2.17:5173/']
+    cors:['http://localhost:5173',' http://192.168.2.17:5173']
 })
 app.use(bodyParser.json())
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:80','http://localhost:5173']
+    origin: ['http://192.168.2.17:5173', 'http://localhost:80','http://localhost:5173']
 }))
 
 const userRouter = require('./user/routes');
@@ -73,14 +73,18 @@ io.on("connection", (socket) => {
   
       socket.on('call', (data) => {
         console.log('call...', data)
-        io.to(data.id).emit('incoming-call', socket.id)
+        io.to(data.id).emit('incoming-call', {id: socket.id,...users[socket.id]})
       })
   
       socket.on('deny-call', (data) => {
         console.log('deny-call', data, socket.id)
-        io.to(data.member).emit('deny-call', data)
+        io.to(data.id).emit('deny-call', users[socket.id])
       })
-  
+
+      socket.on('call-accept', (data) => {
+        console.log('call-accept', data, socket.id)
+        io.to(data.id).emit('call-accept', users[socket.id])
+      })
       socket.on('webrtc-connected', (data) => {
         console.log('webrtc-connected', data, socket.id)
         io.to(data.member).emit('webtrc-connected', { member: socket.id })

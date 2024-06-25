@@ -1,23 +1,27 @@
-import { useLocation } from 'react-router-dom'
-import meetingLogo from '../assets/online-meeting.png'
+import TeaIcon from '../assets/teaIcon.gif'
+import ExitIcon from '../assets/power.svg'
+import {  useNavigate } from 'react-router-dom';
 
 
-export default function NavBar(props){
- 
+export default function NavBar(props) {
+    let navigator = useNavigate();
 
-    return (
-        <nav className="flex flex-row justify-between items-center bg-cyan-500 w-full h-12 p-3">
-        <div className="flex items-center">
-            <div className="font-bold text-white text-2xl m-2">CharCha</div>
-            <img src={meetingLogo} alt="" width='30px' height='30px' />
+    function handleExit(){
+        navigator('/login',{replace:true})
+    }
+
+  return (
+    <nav className="flex flex-row justify-between  bg-cyan-500 w-full h-12">
+      <div className="flex  bg-white">
+        <div className="font-bold   text-2xl  flex px-2">
+          <span className='text-cyan-500 self-center'>CharCha</span>
+          <img src={TeaIcon} className='' alt="Tea Icon" width='40px' height='40px' />
         </div>
-        <div className='ml-auto place-self-end text-red-200 font-bold'>{props.userName}
-        
-        </div>
-        <button className="bg-red-500 text-white m-1 py-1">Exit</button>
-       
-
+      </div>
+      <div className='ml-auto place-self-end self-center text-white  font-bold mx-2'>
+        <img src={props.profile} alt={props.userName} className='hover:cursor-pointer' height={40} width={40} />
+      </div>
+      <img src={ExitIcon} alt="" height={30} width={30} className='mx-0.5 hover:cursor-pointer' onClick={handleExit}/>
     </nav>
-    
-    )
+  );
 }

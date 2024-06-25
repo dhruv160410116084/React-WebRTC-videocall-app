@@ -7,6 +7,8 @@ import { socket } from "../socket";
 import MediaControl from "../MediaControl";
 import { ToastContainer, toast } from 'react-toastify';
 import CallToast from "../CallToast";
+import IncomingCallToast from "../IncomingCallToast";
+import MissedCallToast from "../MissedCallToast";
 
 
 const configuration = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
@@ -20,26 +22,38 @@ export default function Lobby(props) {
   const remoteVideoRef = useRef(null);
   const [stream, setStream] = useState(null);
   const location = useLocation();
-  const [pcState,setPcState] = useState(null)
+  const [pcState, setPcState] = useState(null)
   const [isCamOn, setIsCamOn] = useState(true);
   const [isMicOn, setIsMicOn] = useState(true);
+  const [userList, setUserList] = useState([]);
+  let incomingCallToastRef = useRef(null)
+  let callToastRef = useRef(null)
+  const [isOnCall,setIsOnCall] = useState(false)
+
+
+
+  const makeWebRTCCall = async (member) => {
+    remoteSocketId = member;
+    let _pc = await createConnection();
+    setPcState(_pc)
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    socket.emit('offer', { member, offer });
+  };
 
   useEffect(() => {
     handleVideo();
     setupSocketListeners();
-    
-    console.log('socketId: ',socket.id)
-    toast(<CallToast/>)
+
+
 
     return () => {
       cleanup();
     };
   }, []);
 
-  socket.on('incoming-call',(data)=>{
-    console.log('incoming call from ',data);
-    toast('incoming call from'+data.id)
-  })
+
+
 
 
   const handleVideo = async (deviceId) => {
@@ -56,7 +70,7 @@ export default function Lobby(props) {
   };
 
   const setupSocketListeners = () => {
-    socket.emit('user-data', {data:location.state});
+    socket.emit('user-data', { data: location.state });
 
     socket.on('offer', async message => {
       console.log("Offer received:", message);
@@ -65,7 +79,7 @@ export default function Lobby(props) {
         await pc.setRemoteDescription(new RTCSessionDescription(message.offer));
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
-        remoteSocketId=message.sender
+        remoteSocketId = message.sender
         socket.emit('answer', { receiver: message.sender, answer });
       }
     });
@@ -87,6 +101,22 @@ export default function Lobby(props) {
         }
       }
     });
+    socket.on('incoming-call', (data) => {
+      console.log('incoming call from ', data);
+
+      incomingCallToastRef.current = toast(<IncomingCallToast
+        userName={data.data.userName}
+        userId={data.id}
+        makeWebRTCCall={makeWebRTCCall} />)
+    })
+    socket.on('deny-call', data => {
+      toast.dismiss(incomingCallToastRef.current)
+      toast(<MissedCallToast userName={data.data.userName} />, { autoClose: 3000 })
+    })
+
+    socket.on('call-accept', (data)=>{
+      toast.dismiss(callToastRef.current)
+    })
   };
 
   const createConnection = async () => {
@@ -94,9 +124,9 @@ export default function Lobby(props) {
       pc = new RTCPeerConnection(configuration);
 
       pc.onicecandidate = event => {
-        console.log('generate Ice candidate',event.candidate)
+        console.log('generate Ice candidate', event.candidate)
         if (event.candidate) {
-          socket.emit('candidate', { receiver: remoteSocketId   , candidate: event.candidate });
+          socket.emit('candidate', { receiver: remoteSocketId, candidate: event.candidate });
         }
       };
 
@@ -108,9 +138,16 @@ export default function Lobby(props) {
       };
 
       pc.onconnectionstatechange = () => {
+        console.log(pc.connectionState )
         if (pc.connectionState === 'connected') {
-          console.log('Peers connected');
-          remoteVideoRef.current.className='block'
+          console.log('Peers connected',remoteVideoRef.current.className);
+          // remoteVideoRef.current.className.replace('hidden','')
+          // remoteVideoRef.current.className = 'block'
+          // remoteVideoRef.current.className='block'
+          setIsOnCall(true)
+        }else if(pc.connectionState === 'disconnected'){
+            cleanup();
+           toast(<h2>Call ended</h2>,{autoClose:3000})
         }
       };
 
@@ -121,23 +158,23 @@ export default function Lobby(props) {
     }
   };
 
-  const makeCall = (member)=>{
+  const makeCall = (member) => {
     // remoteSocketId = member;
-    socket.emit('call',{id:member})
+    socket.emit('call', { id: member })
+    console.log(userList)
+    let user = userList.find(e => e.socketId === member ? e.userName : null)
+    console.log(user)
+    callToastRef.current= toast(<CallToast userName={user.userName} />, {})
+
 
   }
-  // const makeCall = async (member) => {
-  //   remoteSocketId = member;
-  //   let _pc = await createConnection();
-  //   setPcState(_pc)
-  //   const offer = await pc.createOffer();
-  //   await pc.setLocalDescription(offer);
-  //   socket.emit('offer', { member, offer });
-  // };
+
+
 
   const cleanup = () => {
+    setIsOnCall(false)
     if (localStream) {
-      localStream.getTracks().forEach(track => track.stop());
+      // localStream.getTracks().forEach(track => track.stop());
     }
     if (pc) {
       pc.close();
@@ -148,39 +185,53 @@ export default function Lobby(props) {
     socket.off('candidate');
   };
 
-  function closeRTC(){
-    if(pc){
+  function closeRTC() {
+    if (pc) {
       pc.close();
       pc = null;
     }
   }
-
+  console.log(location.state)
   return (
     <div className="h-dvh w-full flex flex-col">
-      <NavBar userName={location.state.userName} />
-      <div className='flex flex-row w-full'>
+      <NavBar userName={location.state.userName} profile={location.state.profile} />
+      <div className='flex flex-row h-full relative'>
         <div className='w-1/5 justifiy-self-auto mx-0 '>
-          <UserList className=" text-left" socket={socket} makeCall={makeCall} />
+          <UserList className=" text-left" socket={socket} makeCall={makeCall} userList={userList}
+            setUserList={setUserList}
+          />
         </div>
-        <div className="w-4/5 flex flex-row justify-center bg-gray-200">
-           <video ref={videoRef} autoPlay playsInline style={{display: isCamOn? 'block' : 'none'}} ></video>
-             <img src={'https://avatar.iran.liara.run/public/boy?username='+location.state.username} style={{display: !isCamOn? 'block' : 'none'}} /> 
-          <video autoPlay playsInline ref={remoteVideoRef} className="hidden"></video>
+        <div className={`w-3/5 flex flex-row justify-center bg-gray-200 ${isOnCall && 'relative'}`}>
+        <video autoPlay playsInline ref={remoteVideoRef} className={ ` ${!isOnCall ? 'hidden' : '' } `}></video>
+          <video ref={videoRef} autoPlay playsInline style={{ display: isCamOn ? 'block' : 'none' }}  className={`${isOnCall ? 'absolute top-0 right-0 h-1/5 rounded-bl-lg border-2 border border-indigo-600'  :''}`}
+            ></video>
+          <img src={'https://avatar.iran.liara.run/public/boy?username=' + location.state.username} style={{ display: !isCamOn ? 'block' : 'none' }} />
+          
         </div>
+        <div className="border-x-blue-200 w-1/5">
+          <h2 className="text-2xl">Upcoming Features</h2>
+          <ul className="text-left mx-6" style={{listStyle:'outside'}}>
+            <li>Realtime Chat</li>
+            <li>Peer-to-Peer file transfer</li>
+            <li>Group Video Calls</li>
+          </ul>
+</div>
       </div>
-      <div className="self-center">
-      <MediaControl
-       videoElemRef={videoRef} 
-       cleanup={cleanup} 
-       localStream={localStream} 
-       handleVideo={handleVideo} 
-       pc={pcState} 
-       remotePc={remotePc}
-       isCamOn={isCamOn}
-       setIsCamOn={setIsCamOn}
-       isMicOn={isMicOn}
-       setIsMicOn={setIsMicOn}
-       />
+   
+      <div className="self-center absolute bottom-0 ">
+        <MediaControl
+          videoElemRef={videoRef}
+          cleanup={cleanup}
+          localStream={localStream}
+          handleVideo={handleVideo}
+          pc={pcState}
+          remotePc={remotePc}
+          isCamOn={isCamOn}
+          setIsCamOn={setIsCamOn}
+          isMicOn={isMicOn}
+          setIsMicOn={setIsMicOn}
+          isOnCall={isOnCall}
+        />
 
       </div>
       <ToastContainer autoClose={false} />

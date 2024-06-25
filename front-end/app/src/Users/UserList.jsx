@@ -6,7 +6,7 @@ import { SERVER_URL, socket } from '../socket';
 
 function UserList(props) {
 
-    const [userList, setUserList] = useState([]);
+    
     const [tab, setTab] = useState(1)
     const [allUsers, setAllUsersList] = useState([])
 
@@ -22,9 +22,9 @@ function UserList(props) {
 
             }).filter(v => v.socketId !== socket.id)
             console.log(data,' refined data')
-            setUserList(data)
+            props.setUserList(data)
         })
-    }, [])
+    }, [  ])
 
     function handleOnClick(e) {
         // console.log(e)
@@ -74,7 +74,7 @@ function UserList(props) {
 
 
             {tab == 1 &&
-                (userList.length > 0 ? userList.map(u => {
+                (props.userList.length > 0 ? props.userList.map(u => {
                     console.log(u)
                     return <div className='' key={u.socketId}>
                         <User data={u} makeCall={props.makeCall} tab={tab} />
