@@ -5,10 +5,14 @@ import { playVideoFromCamera } from "../helper/webrtc";
 import { useLocation } from "react-router-dom";
 import { socket } from "../socket";
 import MediaControl from "../MediaControl";
+import { ToastContainer, toast } from 'react-toastify';
+import CallToast from "../CallToast";
+
 
 const configuration = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
 let pc = null;
 let localStream = null;
+let remotePc = null;
 let remoteSocketId = null;
 
 export default function Lobby(props) {
@@ -16,20 +20,34 @@ export default function Lobby(props) {
   const remoteVideoRef = useRef(null);
   const [stream, setStream] = useState(null);
   const location = useLocation();
+  const [pcState,setPcState] = useState(null)
+  const [isCamOn, setIsCamOn] = useState(true);
+  const [isMicOn, setIsMicOn] = useState(true);
 
   useEffect(() => {
     handleVideo();
     setupSocketListeners();
+    
+    console.log('socketId: ',socket.id)
+    toast(<CallToast/>)
 
     return () => {
       cleanup();
     };
   }, []);
 
-  const handleVideo = async () => {
+  socket.on('incoming-call',(data)=>{
+    console.log('incoming call from ',data);
+    toast('incoming call from'+data.id)
+  })
+
+
+  const handleVideo = async (deviceId) => {
     try {
-      const stream = await playVideoFromCamera();
+      const stream = await playVideoFromCamera(deviceId);
       setStream(stream);
+      console.log('stream id -------------')
+      console.log(stream.getVideoTracks()[0].getCapabilities())
       videoRef.current.srcObject = stream;
       localStream = stream;
     } catch (error) {
@@ -38,12 +56,12 @@ export default function Lobby(props) {
   };
 
   const setupSocketListeners = () => {
-    socket.emit('user-data', location.state.userName);
+    socket.emit('user-data', {data:location.state});
 
     socket.on('offer', async message => {
       console.log("Offer received:", message);
       if (message.offer) {
-        await createConnection();
+        remotePc = await createConnection();
         await pc.setRemoteDescription(new RTCSessionDescription(message.offer));
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
@@ -83,6 +101,7 @@ export default function Lobby(props) {
       };
 
       pc.ontrack = event => {
+        console.log('videtrack')
         if (remoteVideoRef.current) {
           remoteVideoRef.current.srcObject = event.streams[0];
         }
@@ -98,16 +117,23 @@ export default function Lobby(props) {
       if (localStream) {
         localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
       }
+      return pc;
     }
   };
 
-  const makeCall = async (member) => {
-    remoteSocketId = member;
-    await createConnection();
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-    socket.emit('offer', { member, offer });
-  };
+  const makeCall = (member)=>{
+    // remoteSocketId = member;
+    socket.emit('call',{id:member})
+
+  }
+  // const makeCall = async (member) => {
+  //   remoteSocketId = member;
+  //   let _pc = await createConnection();
+  //   setPcState(_pc)
+  //   const offer = await pc.createOffer();
+  //   await pc.setLocalDescription(offer);
+  //   socket.emit('offer', { member, offer });
+  // };
 
   const cleanup = () => {
     if (localStream) {
@@ -122,22 +148,42 @@ export default function Lobby(props) {
     socket.off('candidate');
   };
 
+  function closeRTC(){
+    if(pc){
+      pc.close();
+      pc = null;
+    }
+  }
+
   return (
     <div className="h-dvh w-full flex flex-col">
       <NavBar userName={location.state.userName} />
       <div className='flex flex-row w-full'>
-        <div className='w-1/5 justifiy-self-auto mx-8 '>
-          <UserList className="p-3 text-left" socket={socket} makeCall={makeCall} />
+        <div className='w-1/5 justifiy-self-auto mx-0 '>
+          <UserList className=" text-left" socket={socket} makeCall={makeCall} />
         </div>
         <div className="w-4/5 flex flex-row justify-center bg-gray-200">
-          <video ref={videoRef} autoPlay playsInline></video>
+           <video ref={videoRef} autoPlay playsInline style={{display: isCamOn? 'block' : 'none'}} ></video>
+             <img src={'https://avatar.iran.liara.run/public/boy?username='+location.state.username} style={{display: !isCamOn? 'block' : 'none'}} /> 
           <video autoPlay playsInline ref={remoteVideoRef} className="hidden"></video>
         </div>
       </div>
       <div className="self-center">
-      <MediaControl />
+      <MediaControl
+       videoElemRef={videoRef} 
+       cleanup={cleanup} 
+       localStream={localStream} 
+       handleVideo={handleVideo} 
+       pc={pcState} 
+       remotePc={remotePc}
+       isCamOn={isCamOn}
+       setIsCamOn={setIsCamOn}
+       isMicOn={isMicOn}
+       setIsMicOn={setIsMicOn}
+       />
 
       </div>
+      <ToastContainer autoClose={false} />
     </div>
   );
 }

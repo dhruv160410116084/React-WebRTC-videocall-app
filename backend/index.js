@@ -2,24 +2,32 @@ const express = require('express')
 const {createServer} = require('node:http')
 const {Server} = require('socket.io')
 const cors = require('cors');
+const bodyParser = require('body-parser')
 const app = express();
 const server = createServer(app)
 const io = new Server(server,{
     cors:['http://localhost:5173',' http://192.168.2.17:5173/']
 })
+app.use(bodyParser.json())
+
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:80','http://localhost:5173']
+}))
+
+const userRouter = require('./user/routes');
+const errorHandler = require('./errorHandler');
 
 
-// app.use(cors({
-//     origin: ['http://localhost:3000', 'http://localhost:80','http://localhost:5173/']
-// }))
+app.use('/user',userRouter)
 
 // app.use(function(req,res,next){
-//     // res.setHeader('Access-Control-Allow-Origin', '*');
-//     // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-//     // res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-//     // res.setHeader('Access-Control-Allow-Credentials', true);
+//     res.setHeader('Access-Control-Allow-Origin', '*');
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+//     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+//     res.setHeader('Access-Control-Allow-Credentials', true);
 //     next();
 // })
+
 let users = {}
 
 io.on("connection", (socket) => {
@@ -63,9 +71,9 @@ io.on("connection", (socket) => {
         io.emit('users', users)
       });
   
-      socket.on('call', (id) => {
-        console.log('call...', id)
-        io.to(id).emit('incoming-call', socket.id)
+      socket.on('call', (data) => {
+        console.log('call...', data)
+        io.to(data.id).emit('incoming-call', socket.id)
       })
   
       socket.on('deny-call', (data) => {
@@ -81,6 +89,15 @@ io.on("connection", (socket) => {
       console.log(error)
     }
   });
+
+app.get('/hello',(req,res)=>{
+  
+  
+  res.send('<h1>Hello World</h1>')
+  
+})
+
+app.use(errorHandler)
 
 
 server.listen(3000, () => {

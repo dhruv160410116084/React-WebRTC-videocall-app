@@ -1,8 +1,8 @@
- export async function playVideoFromCamera(camera){
+ export async function playVideoFromCamera(deviceId){
     try {
         const list = await navigator.mediaDevices.enumerateDevices();
         console.log(list)
-        const stream = await navigator.mediaDevices.getUserMedia({video:true,audio:false})
+        const stream = await navigator.mediaDevices.getUserMedia({video:{deviceId},audio:true})
         // console.log(stream)
         return stream
     } catch (error) {
