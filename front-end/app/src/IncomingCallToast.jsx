@@ -27,7 +27,7 @@ export default function IncomingCallToast(props){
             <img src={callGif} alt="" height={32} width={32} />
             <h2> <b>Call from {props.userName} </b></h2>
             <img src={callAccept} className='hover:cursor-pointer' alt="" height={32} width={32} onClick={handleAcceptCall} />
-            <img src={callDeny} alt="" height={32} width={32} className='mx-0.5' onClick={handleDenyCall} />
+            <img src={callDeny} alt="" height={32} width={32} className='mx-0.5 hover:cursor-pointer' onClick={handleDenyCall} />
             <audio src={incomingCallTone} autoPlay loop></audio>
         </div>
     )

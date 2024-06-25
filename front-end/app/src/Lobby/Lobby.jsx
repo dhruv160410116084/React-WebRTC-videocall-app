@@ -58,12 +58,23 @@ export default function Lobby(props) {
 
   const handleVideo = async (deviceId) => {
     try {
-      const stream = await playVideoFromCamera(deviceId);
+      const stream = await playVideoFromCamera(deviceId,isMicOn);
       setStream(stream);
       console.log('stream id -------------')
       console.log(stream.getVideoTracks()[0].getCapabilities())
       videoRef.current.srcObject = stream;
       localStream = stream;
+
+      if(isOnCall){
+        console.log('re-adding tracks')
+      if (localStream) {
+        localStream.getTracks().forEach(track =>{
+          let senders = pc.getSenders().find(s => s.track.kind === track.kind)
+          console.log(senders)
+          senders.replaceTrack(track)
+        });
+      }
+      }
     } catch (error) {
       console.error("Error accessing media devices.", error);
     }
@@ -114,9 +125,15 @@ export default function Lobby(props) {
       toast(<MissedCallToast userName={data.data.userName} />, { autoClose: 3000 })
     })
 
+socket.on('cancel-call', data => {
+      toast.dismiss(incomingCallToastRef.current)
+      toast(`Missed Call from ${data.data.userName}`, { autoClose: 3000 })
+    })
     socket.on('call-accept', (data)=>{
       toast.dismiss(callToastRef.current)
     })
+
+
   };
 
   const createConnection = async () => {
@@ -146,8 +163,9 @@ export default function Lobby(props) {
           // remoteVideoRef.current.className='block'
           setIsOnCall(true)
         }else if(pc.connectionState === 'disconnected'){
-            cleanup();
-           toast(<h2>Call ended</h2>,{autoClose:3000})
+          toast(<h2>Call ended</h2>,{autoClose:3000})
+           
+          cleanup();
         }
       };
 
@@ -164,7 +182,7 @@ export default function Lobby(props) {
     console.log(userList)
     let user = userList.find(e => e.socketId === member ? e.userName : null)
     console.log(user)
-    callToastRef.current= toast(<CallToast userName={user.userName} />, {})
+    callToastRef.current= toast(<CallToast userName={user.userName} id={user.socketId}/>, {})
 
 
   }
@@ -173,9 +191,9 @@ export default function Lobby(props) {
 
   const cleanup = () => {
     setIsOnCall(false)
-    if (localStream) {
-      // localStream.getTracks().forEach(track => track.stop());
-    }
+    // if (localStream) {
+    //   // localStream.getTracks().forEach(track => track.stop());
+    // }
     if (pc) {
       pc.close();
       pc = null;
@@ -185,12 +203,7 @@ export default function Lobby(props) {
     socket.off('candidate');
   };
 
-  function closeRTC() {
-    if (pc) {
-      pc.close();
-      pc = null;
-    }
-  }
+
   console.log(location.state)
   return (
     <div className="h-dvh w-full flex flex-col">

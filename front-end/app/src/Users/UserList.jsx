@@ -55,7 +55,7 @@ function UserList(props) {
     }
 
     return (
-        <div id='user-list' className={props.className + ' border-x-blue-200'}>
+        <div id='user-list' className={props.className + ' border-x-blue-200 divide-y divide-black'}>
             {/* <h2 className=' text-2xl text-center '>  <b>Users</b> </h2> */}
             <div className='flex flex-row justify-center bg-indigo-500'>
                 <div

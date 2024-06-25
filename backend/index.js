@@ -80,6 +80,11 @@ io.on("connection", (socket) => {
         console.log('deny-call', data, socket.id)
         io.to(data.id).emit('deny-call', users[socket.id])
       })
+      socket.on('cancel-call', (data) => {
+        console.log('deny-call', data, socket.id)
+        io.to(data.id).emit('cancel-call', users[socket.id])
+      })
+
 
       socket.on('call-accept', (data) => {
         console.log('call-accept', data, socket.id)
