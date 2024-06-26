@@ -110,6 +110,8 @@ export default function Lobby(props) {
         });
       }
     } catch (error) {
+      toast('Error in opening video camera')
+
       console.error("Error accessing media devices.", error);
     }
   };
@@ -252,15 +254,15 @@ export default function Lobby(props) {
         />
       </div>
       <ToastContainer
-        position="top-center"
-        autoClose={false}
-        newestOnTop
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss={false}
-        draggable={false}
-        pauseOnHover={false}
-        theme="light"
+        // position="top-center"
+        // autoClose={false}
+        // newestOnTop
+        // closeOnClick={false}
+        // rtl={false}
+        // pauseOnFocusLoss={false}
+        // draggable={false}
+        // pauseOnHover={false}
+        // theme="light"
       />
     </div>
   )

@@ -104,10 +104,11 @@ export default function MediaControl({ cleanup, localStream, handleVideo, pc, cl
   };
 
   const handleCameraStreamChange = async (e) =>{
+   await handleVideo(e.target.value,isMicOn)
+
     console.log(e.target.value)
     setCamera(e.target.value)
   //  let stream = await playVideoFromCamera(e.target.value)
-   await handleVideo(e.target.value,isMicOn)
   }
 
   const handleCallEnd = () => {

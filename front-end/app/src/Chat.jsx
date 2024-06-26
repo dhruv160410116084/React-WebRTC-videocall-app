@@ -16,6 +16,7 @@ export function Chat(props) {
 
     let msgData = {
       message: message,
+      time:new Date(),
       user: { socketId: socket.id, userName: location.state.userName, profile: location.state.profile },
     };
 
@@ -48,11 +49,11 @@ export function Chat(props) {
 
       <ChatMessage chatList={props.chatList} />
       <form className='bg-white flex flex-row justify-between' onSubmit={handleSubmit}>
-        <button className='bg-white'>
+        <button className='bg-cyan-600 rounded-none'>
           <img src={AttachmentIcon} alt="" height={22} width={22} />
         </button>
-        <input type='text' name="message" className='w-full' value={message} onChange={handleMessage} />
-        <button type='submit'>
+        <input type='text' name="message" className='px-1 w-full focus:outline-none' value={message} onChange={handleMessage} />
+        <button type='submit' className='bg-cyan-600 rounded-none'>
           <img src={PapperPlanIcon} alt="" height={22} width={22} />
         </button>
       </form>
