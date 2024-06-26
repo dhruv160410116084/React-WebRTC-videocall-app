@@ -11,7 +11,6 @@ import IncomingCallToast from "../IncomingCallToast";
 import MissedCallToast from "../MissedCallToast";
 import { Chat } from "../Chat";
 
-
 const configuration = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
 let pc = null;
 let localStream = null;
@@ -24,24 +23,14 @@ export default function Lobby(props) {
   const remoteVideoRef = useRef(null);
   const [stream, setStream] = useState(null);
   const location = useLocation();
-  const [pcState, setPcState] = useState(null)
+  const [pcState, setPcState] = useState(null);
   const [isCamOn, setIsCamOn] = useState(true);
   const [isMicOn, setIsMicOn] = useState(true);
   const [userList, setUserList] = useState([]);
-  let incomingCallToastRef = useRef(null)
-  let callToastRef = useRef(null)
-  const [isOnCall, setIsOnCall] = useState(false)
-  // const [dataChState,setDataChState] = useState(null)
-  const [chatList, setChatList] = useState([
-    { message: "Hello how are you? It's been a long time no see brother.", user: { userName: 'dhruv', profile: 'url' } },
-    { message: "I'm fine how are you?", user: { userName: 'mac', profile: 'url' } },
-
-])
-
-
-
-
-
+  const incomingCallToastRef = useRef(null);
+  const callToastRef = useRef(null);
+  const [isOnCall, setIsOnCall] = useState(false);
+  const [chatList, setChatList] = useState([]);
 
   useEffect(() => {
     handleVideo();
@@ -51,73 +40,74 @@ export default function Lobby(props) {
     };
   }, []);
 
+  useEffect(() => {
+    if (dataChannel) {
+      dataChannel.onmessage = (event) => {
+        console.log('Message received: ', event.data);
+        try {
+          const data = JSON.parse(event.data);
+          setChatList((prevChatList) => [...prevChatList, data]);
+        } catch (error) {
+          console.error('Error parsing data channel message:', error);
+        }
+      };
 
-const setupDataChannel = ()=>{
-
-  pc.addEventListener('datachannel', event => {
-    console.log('data: ', event)
-    dataChannel = event.channel;
-    console.log('data channel', dataChannel)
-    dataChannel.onmessage = event => {
-      console.log('message: ', event.data)
+      dataChannel.onopen = () => {
+        if (dataChannel.readyState === 'open') {
+          console.log("Data channel is open");
+        }
+      };
     }
-    dataChannel.onopen = (event) => {
-      if (dataChannel.readyState === 'open') {
-        console.log("data channel is open now ---------------->")
-        // setDataChState(dataChannel)
-      setChatList(event.data)
+  }, [dataChannel]);
 
-        // dataChannel.send('Hello' + socket.id)
-      }
+  const setupDataChannel = () => {
+    if(dataChannel){
+      dataChannel.onmessage = (event) => {
+        console.log('Message received: ', event.data);
+        try {
+          const data = JSON.parse(event.data);
+          setChatList((prevChatList) => [...prevChatList, data]);
+        } catch (error) {
+          console.error('Error parsing data channel message:', error);
+        }
+      };
+  
+      dataChannel.onopen = () => {
+        if (dataChannel.readyState === 'open') {
+          console.log("Data channel is open");
+        }
+      };
     }
-  });
+ 
+  };
 
-  if(dataChannel){
-    dataChannel.onmessage = event => {
-      console.log('message: ', event.data)
-      setChatList(event.data)
-    }
-    dataChannel.onopen = (event) => {
-      if (dataChannel.readyState === 'open') {
-        console.log("data channel is open now ---------------->")
-        // setDataChState(dataChannel)
-        // dataChannel.send('Hello' + socket.id)
-      }
-    }
-  }
-}
+  const makeWebRTCCall = async (member) => {
+    remoteSocketId = member;
+    let _pc = await createConnection();
+    setPcState(_pc);
 
-const makeWebRTCCall = async (member) => {
-  remoteSocketId = member;
-  let _pc = await createConnection();
-  setPcState(_pc)
+    dataChannel = pc.createDataChannel('data');
+    setupDataChannel();
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
 
-  dataChannel = pc.createDataChannel('data');
-  setupDataChannel()
-  const offer = await pc.createOffer();
-  await pc.setLocalDescription(offer);
-
-  socket.emit('offer', { member, offer });
-};
+    socket.emit('offer', { member, offer });
+  };
 
   const handleVideo = async (deviceId) => {
     try {
       const stream = await playVideoFromCamera(deviceId, isMicOn);
       setStream(stream);
-      // console.log('stream id -------------')
-      console.log(stream.getVideoTracks()[0].getCapabilities())
       videoRef.current.srcObject = stream;
       localStream = stream;
 
-      if (isOnCall) {
-        // console.log('re-adding tracks')
-        if (localStream) {
-          localStream.getTracks().forEach(track => {
-            let senders = pc.getSenders().find(s => s.track.kind === track.kind)
-            // console.log(senders)
-            senders.replaceTrack(track)
-          });
-        }
+      if (isOnCall && localStream) {
+        localStream.getTracks().forEach(track => {
+          let senders = pc.getSenders().find(s => s.track.kind === track.kind);
+          if (senders) {
+            senders.replaceTrack(track);
+          }
+        });
       }
     } catch (error) {
       console.error("Error accessing media devices.", error);
@@ -128,32 +118,30 @@ const makeWebRTCCall = async (member) => {
     socket.emit('user-data', { data: location.state });
 
     socket.on('offer', async message => {
-      // console.log("Offer received:", message);
-
       if (message.offer) {
         remotePc = await createConnection();
         await pc.setRemoteDescription(new RTCSessionDescription(message.offer));
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
-        remoteSocketId = message.sender
-       setupDataChannel()
+        remoteSocketId = message.sender;
+        console.log('in offer setting channel---');
+        pc.ondatachannel = (event)=>{
+          dataChannel = event.channel
+          setupDataChannel();
 
-
+        }
 
         socket.emit('answer', { receiver: message.sender, answer });
       }
     });
 
     socket.on('answer', async message => {
-      // console.log("Answer received:", message);
-      // console.log('data: ', dataChannel)
       if (message.answer && pc) {
         await pc.setRemoteDescription(new RTCSessionDescription(message.answer));
       }
     });
 
     socket.on('candidate', async message => {
-      console.log('Candidate received:', message.candidate);
       if (message.candidate && pc) {
         try {
           await pc.addIceCandidate(new RTCIceCandidate(message.candidate));
@@ -162,27 +150,24 @@ const makeWebRTCCall = async (member) => {
         }
       }
     });
-    socket.on('incoming-call', (data) => {
-      // console.log('incoming call from ', data);
 
-      incomingCallToastRef.current = toast(<IncomingCallToast
-        userName={data.data.userName}
-        userId={data.id}
-        makeWebRTCCall={makeWebRTCCall} />)
-    })
+    socket.on('incoming-call', (data) => {
+      incomingCallToastRef.current = toast(<IncomingCallToast userName={data.data.userName} userId={data.id} makeWebRTCCall={makeWebRTCCall} />);
+    });
+
     socket.on('deny-call', data => {
-      toast.dismiss(incomingCallToastRef.current)
-      toast(<MissedCallToast userName={data.data.userName} />, { autoClose: 3000 })
-    })
+      toast.dismiss(incomingCallToastRef.current);
+      toast(<MissedCallToast userName={data.data.userName} />, { autoClose: 3000 });
+    });
 
     socket.on('cancel-call', data => {
-      toast.dismiss(incomingCallToastRef.current)
-      toast(`Missed Call from ${data.data.userName}`, { autoClose: 3000 })
-    })
-    socket.on('call-accept', (data) => {
-      toast.dismiss(callToastRef.current)
-    })
+      toast.dismiss(incomingCallToastRef.current);
+      toast(`Missed Call from ${data.data.userName}`, { autoClose: 3000 });
+    });
 
+    socket.on('call-accept', (data) => {
+      toast.dismiss(callToastRef.current);
+    });
   };
 
   const createConnection = async () => {
@@ -190,35 +175,22 @@ const makeWebRTCCall = async (member) => {
       pc = new RTCPeerConnection(configuration);
 
       pc.onicecandidate = event => {
-        // console.log('generate Ice candidate', event.candidate)
         if (event.candidate) {
           socket.emit('candidate', { receiver: remoteSocketId, candidate: event.candidate });
         }
       };
 
       pc.ontrack = event => {
-        // console.log('videtrack')
         if (remoteVideoRef.current) {
           remoteVideoRef.current.srcObject = event.streams[0];
         }
       };
 
       pc.onconnectionstatechange = () => {
-        // console.log(pc.connectionState)
         if (pc.connectionState === 'connected') {
-          console.log('Peers connected', remoteVideoRef.current.className);
-          // remoteVideoRef.current.className.replace('hidden','')
-          // remoteVideoRef.current.className = 'block'
-          // remoteVideoRef.current.className='block'
-
-          // dataChannel.send('hello '+socket.id)
-
-          setIsOnCall(true)
-
-
+          setIsOnCall(true);
         } else if (pc.connectionState === 'disconnected') {
-          toast(<h2>Call ended</h2>, { autoClose: 3000 })
-
+          toast(<h2>Call ended</h2>, { autoClose: 3000 });
           cleanup();
         }
       };
@@ -231,23 +203,13 @@ const makeWebRTCCall = async (member) => {
   };
 
   const makeCall = (member) => {
-    // remoteSocketId = member;
-    socket.emit('call', { id: member })
-    console.log(userList)
-    let user = userList.find(e => e.socketId === member ? e.userName : null)
-    console.log(user)
-    callToastRef.current = toast(<CallToast userName={user.userName} id={user.socketId} />, {})
-
-
-  }
-
-
+    socket.emit('call', { id: member });
+    let user = userList.find(e => e.socketId === member);
+    callToastRef.current = toast(<CallToast userName={user.userName} id={user.socketId} />, {});
+  };
 
   const cleanup = () => {
-    setIsOnCall(false)
-    // if (localStream) {
-    //   // localStream.getTracks().forEach(track => track.stop());
-    // }
+    setIsOnCall(false);
     if (pc) {
       pc.close();
       pc = null;
@@ -257,46 +219,49 @@ const makeWebRTCCall = async (member) => {
     socket.off('candidate');
   };
 
-
-  // console.log(location.state)
   return (
     <div className="h-dvh w-full flex flex-col">
       <NavBar userName={location.state.userName} profile={location.state.profile} />
       <div className='flex flex-row h-full relative'>
         <div className='w-1/5 justifiy-self-auto mx-0 '>
-          <UserList className=" text-left" socket={socket} makeCall={makeCall} userList={userList}
-            setUserList={setUserList}
-          />
+          <UserList className="text-left" socket={socket} makeCall={makeCall} userList={userList} setUserList={setUserList} />
         </div>
         <div className={`w-3/5 flex flex-row justify-center bg-gray-200 ${isOnCall && 'relative'}`}>
           <video autoPlay playsInline ref={remoteVideoRef} className={` ${!isOnCall ? 'hidden' : ''} `}></video>
-          <video ref={videoRef} autoPlay playsInline style={{ display: isCamOn ? 'block' : 'none' }} muted className={`${isOnCall ? 'absolute top-0 right-0 h-1/5 rounded-bl-lg border-2 border border-indigo-600' : ''}`}
-          ></video>
+          <video ref={videoRef} autoPlay playsInline style={{ display: isCamOn ? 'block' : 'none' }} muted className={`${isOnCall ? 'absolute top-0 right-0 h-1/5 rounded-bl-lg border-2 border border-indigo-600' : ''}`}></video>
           <img src={'https://avatar.iran.liara.run/public/boy?username=' + location.state.username} style={{ display: !isCamOn ? 'block' : 'none' }} />
-
         </div>
         <div className="border-x-blue-200 w-1/5 flex flex-col justify-end">
-          <Chat dc={dataChannel} chatList={chatList} setChatList={setChatList}/>
+          <Chat dc={dataChannel} chatList={chatList} setChatList={setChatList} />
         </div>
       </div>
 
-      <div className="self-center absolute bottom-0 ">
+      <div className="self-center absolute bottom-0">
         <MediaControl
-          videoElemRef={videoRef}
-          cleanup={cleanup}
-          localStream={localStream}
-          handleVideo={handleVideo}
-          pc={pcState}
-          remotePc={remotePc}
-          isCamOn={isCamOn}
-          setIsCamOn={setIsCamOn}
-          isMicOn={isMicOn}
-          setIsMicOn={setIsMicOn}
-          isOnCall={isOnCall}
+         videoElemRef={videoRef}
+         cleanup={cleanup}
+         localStream={localStream}
+         handleVideo={handleVideo}
+         pc={pcState}
+         remotePc={remotePc}
+         isCamOn={isCamOn}
+         setIsCamOn={setIsCamOn}
+         isMicOn={isMicOn}
+         setIsMicOn={setIsMicOn}
+         isOnCall={isOnCall}
         />
-
       </div>
-      <ToastContainer autoClose={false} />
+      <ToastContainer
+        position="top-center"
+        autoClose={false}
+        newestOnTop
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover={false}
+        theme="light"
+      />
     </div>
-  );
+  )
 }
