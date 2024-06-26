@@ -16,12 +16,12 @@ function UserList(props) {
         props.socket.emit('get-users');
         props.socket.on('users', function (data) {
 
-            console.log(data)
+            // console.log(data)
             data = Object.keys(data).map(key => {
                 return { socketId: key, ...data[key].data }
 
             }).filter(v => v.socketId !== socket.id)
-            console.log(data,' refined data')
+            // console.log(data,' refined data')
             props.setUserList(data)
         })
     }, [  ])
@@ -45,17 +45,17 @@ function UserList(props) {
                     console.log(d)
                  return {   ...d,userName:d.username}
                 })
-                console.log(data)
+                // console.log(data)
 
                 setAllUsersList(data)
             })
 
         }
-        console.log(tab)
+        // console.log(tab)
     }
 
     return (
-        <div id='user-list' className={props.className + ' border-x-blue-200 divide-y divide-black'}>
+        <div id='user-list' className={props.className + ' border-x-blue-200 '}>
             {/* <h2 className=' text-2xl text-center '>  <b>Users</b> </h2> */}
             <div className='flex flex-row justify-center bg-indigo-500'>
                 <div
@@ -74,11 +74,12 @@ function UserList(props) {
 
 
             {tab == 1 &&
+                
                 (props.userList.length > 0 ? props.userList.map(u => {
-                    console.log(u)
+                    // console.log(u)
                     return <div className='' key={u.socketId}>
                         <User data={u} makeCall={props.makeCall} tab={tab} />
-
+                        <hr className='border-black'/>
 
                     </div>
 
@@ -89,6 +90,7 @@ function UserList(props) {
                     return <div className='' key={u.socketId}>
                         
                         <User data={u} makeCall={props.makeCall} />
+                        <hr className='border-black'/>
 
 
                     </div>

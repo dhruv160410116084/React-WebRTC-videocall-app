@@ -1,7 +1,7 @@
  export async function playVideoFromCamera(deviceId,isMicOn){
     try {
         const list = await navigator.mediaDevices.enumerateDevices();
-        console.log(list)
+        // console.log(list)
         const stream = await navigator.mediaDevices.getUserMedia({video:{deviceId},audio:true})
         // console.log(stream)
         if(!isMicOn){
