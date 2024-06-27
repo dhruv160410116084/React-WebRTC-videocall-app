@@ -17,7 +17,7 @@ export default function ChatMessage(props) {
 }
 
   return (
-    <ul className="flex flex-col  m-2 overflow-y-auto">
+    <ul className="flex flex-col  m-2 max-h-screen ">
       {props.chatList.length > 0 && props.chatList.map((m, i) => {
         m.time = new Date(m.time)
         return ( <div key={i} style={{ maxWidth: '80%' }} className={`${socket.id == m.user.socketId ? 'self-end ' : 'self-start '}`}>

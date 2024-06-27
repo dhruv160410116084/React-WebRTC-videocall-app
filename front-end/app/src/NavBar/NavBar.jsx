@@ -11,7 +11,7 @@ export default function NavBar(props) {
     }
 
   return (
-    <nav className="flex flex-row justify-between  bg-cyan-500 w-full h-12 z-50">
+    <nav className="flex flex-row justify-between  bg-cyan-500 w-full h-12">
       <div className="flex  bg-white">
         <div className="font-bold   text-2xl  flex px-2">
           <span className='text-cyan-500 self-center'>CharCha</span>

@@ -33,7 +33,7 @@ export default function Lobby(props) {
   const [chatList, setChatList] = useState([]);
   let fileName = null;
   let fileSize = 0;
-  let fileSocketId=null;
+  let fileSocketId = null;
   let downloadRef = useRef(null);
   let receiveBuffer = [];
   let receivedSize = 0
@@ -49,50 +49,50 @@ export default function Lobby(props) {
   useEffect(() => {
     if (dataChannel) {
       dataChannel.onmessage = (event) => {
-        console.log('Message received: ', event.data,event.data?.type);
+        console.log('Message received: ', event.data, event.data?.type);
         try {
-          if(event.data?.byteLength){
-              receiveBuffer.push(event.data)
-              receivedSize += event.data.byteLength
-              console.log(receivedSize,fileSize)
-              if(receivedSize === fileSize){
-                  const received = new Blob(receiveBuffer)
-                  receiveBuffer=[]
-                  receivedSize=0
-                  downloadRef.current.href = URL.createObjectURL(received)
-                  console.log(downloadRef.current.href)
-                  downloadRef.current.download = fileName
-                  downloadRef.current.click();
-                 
-                  setChatList((prevChatList)=> [...prevChatList,{
-                    type:'file',
-                    user:{socketId:fileSocketId},
-                    fileName:fileName,
-                    fileSize:fileSize,
-                    time:new Date()
-                  }])
-                  fileName=null;
-                  fileSize=0
-                  fileSocketId=null
-              }
+          if (event.data?.byteLength) {
+            receiveBuffer.push(event.data)
+            receivedSize += event.data.byteLength
+            console.log(receivedSize, fileSize)
+            if (receivedSize === fileSize) {
+              const received = new Blob(receiveBuffer)
+              receiveBuffer = []
+              receivedSize = 0
+              downloadRef.current.href = URL.createObjectURL(received)
+              console.log(downloadRef.current.href)
+              downloadRef.current.download = fileName
+              downloadRef.current.click();
 
-          }else{
+              setChatList((prevChatList) => [...prevChatList, {
+                type: 'file',
+                user: { socketId: fileSocketId },
+                fileName: fileName,
+                fileSize: fileSize,
+                time: new Date()
+              }])
+              fileName = null;
+              fileSize = 0
+              fileSocketId = null
+            }
+
+          } else {
             let data = JSON.parse(event.data);
             // data = JSON.parse(data.data)
-            console.log('eventtttt',data)
-            if(data?.type ==='file-metadata'){
+            console.log('eventtttt', data)
+            if (data?.type === 'file-metadata') {
               fileName = data.name;
               fileSize = data.size
               fileSocketId = data.socketId;
-              console.log(fileName,fileSize,event.data.data)
-             
-  
-          }else{
-            setChatList((prevChatList) => [...prevChatList, data]);
+              console.log(fileName, fileSize, event.data.data)
 
+
+            } else {
+              setChatList((prevChatList) => [...prevChatList, data]);
+
+            }
           }
-          }
-          
+
         } catch (error) {
           console.error('Error parsing data channel message:', error);
         }
@@ -107,64 +107,64 @@ export default function Lobby(props) {
   }, [dataChannel]);
 
   const setupDataChannel = () => {
-    if(dataChannel){
+    if (dataChannel) {
       dataChannel.onmessage = (event) => {
-        console.log('Message received: ', event.data,event.data?.type);
+        console.log('Message received: ', event.data, event.data?.type);
         try {
-          if(event.data?.byteLength){
-              receiveBuffer.push(event.data)
-              receivedSize += event.data.byteLength
-              console.log(receivedSize,fileSize)
-              if(receivedSize === fileSize){
-                  const received = new Blob(receiveBuffer)
-                  receiveBuffer=[]
-                  receivedSize=0
-                  downloadRef.current.href = URL.createObjectURL(received)
-                  console.log(downloadRef.current.href)
-                  downloadRef.current.download = fileName
-                  downloadRef.current.click();
-                 
-                  setChatList((prevChatList)=> [...prevChatList,{
-                    type:'file',
-                    user:{socketId:fileSocketId},
-                    fileName:fileName,
-                    fileSize:fileSize,
-                    time:new Date()
-                  }])
-                  fileName=null;
-                  fileSize=0
-                  fileSocketId=null
-              }
+          if (event.data?.byteLength) {
+            receiveBuffer.push(event.data)
+            receivedSize += event.data.byteLength
+            console.log(receivedSize, fileSize)
+            if (receivedSize === fileSize) {
+              const received = new Blob(receiveBuffer)
+              receiveBuffer = []
+              receivedSize = 0
+              downloadRef.current.href = URL.createObjectURL(received)
+              console.log(downloadRef.current.href)
+              downloadRef.current.download = fileName
+              downloadRef.current.click();
 
-          }else{
+              setChatList((prevChatList) => [...prevChatList, {
+                type: 'file',
+                user: { socketId: fileSocketId },
+                fileName: fileName,
+                fileSize: fileSize,
+                time: new Date()
+              }])
+              fileName = null;
+              fileSize = 0
+              fileSocketId = null
+            }
+
+          } else {
             let data = JSON.parse(event.data);
             // data = JSON.parse(data.data)
-            console.log('eventtttt',data)
-            if(data?.type ==='file-metadata'){
+            console.log('eventtttt', data)
+            if (data?.type === 'file-metadata') {
               fileName = data.name;
               fileSize = data.size
               fileSocketId = data.socketId;
-              console.log(fileName,fileSize,event.data.data)
-             
-  
-          }else{
-            setChatList((prevChatList) => [...prevChatList, data]);
+              console.log(fileName, fileSize, event.data.data)
 
+
+            } else {
+              setChatList((prevChatList) => [...prevChatList, data]);
+
+            }
           }
-          }
-          
+
         } catch (error) {
           console.error('Error parsing data channel message:', error);
         }
       };
-  
+
       dataChannel.onopen = () => {
         if (dataChannel.readyState === 'open') {
           console.log("Data channel is open");
         }
       };
     }
- 
+
   };
 
   const makeWebRTCCall = async (member) => {
@@ -213,7 +213,7 @@ export default function Lobby(props) {
         await pc.setLocalDescription(answer);
         remoteSocketId = message.sender;
         console.log('in offer setting channel---');
-        pc.ondatachannel = (event)=>{
+        pc.ondatachannel = (event) => {
           dataChannel = event.channel
           setupDataChannel();
 
@@ -308,49 +308,38 @@ export default function Lobby(props) {
   };
 
   return (
-    <div className="h-dvh w-full flex flex-col">
-      <NavBar userName={location.state.userName} profile={location.state.profile} />
-      <div className='flex flex-row h-full relative'>
-        <div className='w-1/5 justifiy-self-auto mx-0 '>
-          <UserList className="text-left" socket={socket} makeCall={makeCall} userList={userList} setUserList={setUserList} />
-        </div>
-        <div className={`w-3/5 flex flex-row justify-center bg-gray-200 ${isOnCall && 'relative'}`}>
-          <video autoPlay playsInline ref={remoteVideoRef} className={` ${!isOnCall ? 'hidden' : ''} `}></video>
-          <video ref={videoRef} autoPlay playsInline style={{ display: isCamOn ? 'block' : 'none' }} muted className={`${isOnCall ? 'absolute top-0 right-0 h-1/5 rounded-bl-lg border-2 border border-indigo-600' : ''}`}></video>
-          <img src={'https://avatar.iran.liara.run/public/boy?username=' + location.state.username} style={{ display: !isCamOn ? 'block' : 'none' }} />
-        </div>
-        <div className="border-x-blue-200 w-1/5 flex flex-col justify-end">
-          <Chat dc={dataChannel} chatList={chatList} setChatList={setChatList} />
-        </div>
+    <div className="w-full h-screen flex flex-col">
+    <NavBar userName={location.state.userName} profile={location.state.profile} />
+    <div className="flex flex-row relative" style={{maxHeight:'calc(100% - 3rem)'}}>
+      <div className="w-1/5 justify-self-auto mx-0 " >
+        <UserList className="text-left" socket={socket} makeCall={makeCall} userList={userList} setUserList={setUserList} />
       </div>
-
-      <div className="self-center absolute bottom-0">
-        <MediaControl
-         videoElemRef={videoRef}
-         cleanup={cleanup}
-         localStream={localStream}
-         handleVideo={handleVideo}
-         pc={pcState}
-         remotePc={remotePc}
-         isCamOn={isCamOn}
-         setIsCamOn={setIsCamOn}
-         isMicOn={isMicOn}
-         setIsMicOn={setIsMicOn}
-         isOnCall={isOnCall}
-        />
+      <div className={`w-3/5 flex flex-col justify-center bg-gray-200 ${isOnCall && 'relative'}`}>
+        <video autoPlay playsInline ref={remoteVideoRef} className={`${!isOnCall ? 'hidden' : ''} w-full h-full`} />
+        <video ref={videoRef} autoPlay playsInline style={{ display: isCamOn ? 'block' : 'none' }} muted className={`${isOnCall ? 'absolute top-0 right-0 h-1/5 rounded-bl-lg border-2 border border-indigo-600' : 'h-full w-full'}`} />
+        <img src={'https://avatar.iran.liara.run/public/boy?username=' + location.state.username} style={{ display: !isCamOn ? 'block' : 'none' }} className="w-full h-full object-cover" />
       </div>
-      <ToastContainer
-        // position="top-center"
-        autoClose={10000}
-        // newestOnTop
-        // closeOnClick={false}
-        // rtl={false}
-        // pauseOnFocusLoss={false}
-        // draggable={false}
-        // pauseOnHover={false}
-        // theme="light"
-      />
-      <a href="" hidden ref={downloadRef}></a>
+      <Chat dc={dataChannel} chatList={chatList} setChatList={setChatList} />
     </div>
+  
+    <div className="self-center absolute bottom-0">
+      <MediaControl
+        videoElemRef={videoRef}
+        cleanup={cleanup}
+        localStream={localStream}
+        handleVideo={handleVideo}
+        pc={pcState}
+        remotePc={remotePc}
+        isCamOn={isCamOn}
+        setIsCamOn={setIsCamOn}
+        isMicOn={isMicOn}
+        setIsMicOn={setIsMicOn}
+        isOnCall={isOnCall}
+      />
+    </div>
+    <ToastContainer autoClose={10000} />
+    <a href="" hidden ref={downloadRef}></a>
+  </div>
+  
   )
 }

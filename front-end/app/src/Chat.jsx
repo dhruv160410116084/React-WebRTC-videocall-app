@@ -99,15 +99,11 @@ useEffect(()=> {
   },[props.dc])
 
   return (
-    <div className="flex flex-col">
-      <div className='justify-self-start'>
-        <h2 className="text-2xl">Messages</h2>
-   
-      </div>
+    <div className="border-x-blue-200 w-1/5 flex flex-col justify-end" >
 
       <ChatMessage chatList={props.chatList} />
       <form className='bg-white flex flex-row justify-between' onSubmit={handleSubmit}>
-        <button className='bg-cyan-600 rounded-none' onClick={handleFileInput}>
+        <button type='button' className='bg-cyan-600 rounded-none' onClick={handleFileInput}>
           <img src={AttachmentIcon} alt="" height={22} width={22} />
         </button>
         <input type="file" name='file'  hidden ref={fileInputRef} onChange={handleFileChange}/>
