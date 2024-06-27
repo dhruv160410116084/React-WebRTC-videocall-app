@@ -31,6 +31,12 @@ export default function Lobby(props) {
   const callToastRef = useRef(null);
   const [isOnCall, setIsOnCall] = useState(false);
   const [chatList, setChatList] = useState([]);
+  let fileName = null;
+  let fileSize = 0;
+  let fileSocketId=null;
+  let downloadRef = useRef(null);
+  let receiveBuffer = [];
+  let receivedSize = 0
 
   useEffect(() => {
     handleVideo();
@@ -43,10 +49,50 @@ export default function Lobby(props) {
   useEffect(() => {
     if (dataChannel) {
       dataChannel.onmessage = (event) => {
-        console.log('Message received: ', event.data);
+        console.log('Message received: ', event.data,event.data?.type);
         try {
-          const data = JSON.parse(event.data);
-          setChatList((prevChatList) => [...prevChatList, data]);
+          if(event.data?.byteLength){
+              receiveBuffer.push(event.data)
+              receivedSize += event.data.byteLength
+              console.log(receivedSize,fileSize)
+              if(receivedSize === fileSize){
+                  const received = new Blob(receiveBuffer)
+                  receiveBuffer=[]
+                  receivedSize=0
+                  downloadRef.current.href = URL.createObjectURL(received)
+                  console.log(downloadRef.current.href)
+                  downloadRef.current.download = fileName
+                  downloadRef.current.click();
+                 
+                  setChatList((prevChatList)=> [...prevChatList,{
+                    type:'file',
+                    user:{socketId:fileSocketId},
+                    fileName:fileName,
+                    fileSize:fileSize,
+                    time:new Date()
+                  }])
+                  fileName=null;
+                  fileSize=0
+                  fileSocketId=null
+              }
+
+          }else{
+            let data = JSON.parse(event.data);
+            // data = JSON.parse(data.data)
+            console.log('eventtttt',data)
+            if(data?.type ==='file-metadata'){
+              fileName = data.name;
+              fileSize = data.size
+              fileSocketId = data.socketId;
+              console.log(fileName,fileSize,event.data.data)
+             
+  
+          }else{
+            setChatList((prevChatList) => [...prevChatList, data]);
+
+          }
+          }
+          
         } catch (error) {
           console.error('Error parsing data channel message:', error);
         }
@@ -63,10 +109,50 @@ export default function Lobby(props) {
   const setupDataChannel = () => {
     if(dataChannel){
       dataChannel.onmessage = (event) => {
-        console.log('Message received: ', event.data);
+        console.log('Message received: ', event.data,event.data?.type);
         try {
-          const data = JSON.parse(event.data);
-          setChatList((prevChatList) => [...prevChatList, data]);
+          if(event.data?.byteLength){
+              receiveBuffer.push(event.data)
+              receivedSize += event.data.byteLength
+              console.log(receivedSize,fileSize)
+              if(receivedSize === fileSize){
+                  const received = new Blob(receiveBuffer)
+                  receiveBuffer=[]
+                  receivedSize=0
+                  downloadRef.current.href = URL.createObjectURL(received)
+                  console.log(downloadRef.current.href)
+                  downloadRef.current.download = fileName
+                  downloadRef.current.click();
+                 
+                  setChatList((prevChatList)=> [...prevChatList,{
+                    type:'file',
+                    user:{socketId:fileSocketId},
+                    fileName:fileName,
+                    fileSize:fileSize,
+                    time:new Date()
+                  }])
+                  fileName=null;
+                  fileSize=0
+                  fileSocketId=null
+              }
+
+          }else{
+            let data = JSON.parse(event.data);
+            // data = JSON.parse(data.data)
+            console.log('eventtttt',data)
+            if(data?.type ==='file-metadata'){
+              fileName = data.name;
+              fileSize = data.size
+              fileSocketId = data.socketId;
+              console.log(fileName,fileSize,event.data.data)
+             
+  
+          }else{
+            setChatList((prevChatList) => [...prevChatList, data]);
+
+          }
+          }
+          
         } catch (error) {
           console.error('Error parsing data channel message:', error);
         }
@@ -255,7 +341,7 @@ export default function Lobby(props) {
       </div>
       <ToastContainer
         // position="top-center"
-        // autoClose={false}
+        autoClose={10000}
         // newestOnTop
         // closeOnClick={false}
         // rtl={false}
@@ -264,6 +350,7 @@ export default function Lobby(props) {
         // pauseOnHover={false}
         // theme="light"
       />
+      <a href="" hidden ref={downloadRef}></a>
     </div>
   )
 }
