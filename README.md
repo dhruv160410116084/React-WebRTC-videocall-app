@@ -5,7 +5,7 @@
 
   <h3 align="center"> CharCha</h3>
   
-The app is Called CharCha; it's a Hindi word for discussion.
+The app is called CharCha; it's a Hindi word for a discussion.
 
 ![image](https://github.com/dhruv160410116084/React-WebRTC-videocall-app/assets/47494828/dcba565b-1322-4983-8f07-e11cfd644c53)
 
@@ -18,7 +18,7 @@ The app is Called CharCha; it's a Hindi word for discussion.
 
 ## About The Project
 
-CharCha is a WebRTC based Video calling web application. It not only used for video calling it also provides peer-to-peer message and file transfering by levaraging Data Channels of WebRTC. for signaling it uses 
+CharCha is a WebRTC based Video calling web application. It is not only used for video calling. It also provides peer-to-peer messages and files transferring by leveraging the Data Channels of WebRTC. for signaling, it uses 
 Socket.io with node express server.
 
 ## Built With
