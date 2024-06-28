@@ -18,12 +18,20 @@ The app is Called CharCha; it's a Hindi word for discussion.
 
 ## About The Project
 
-The main reason for why i have created this project is that many times i have to work with different projects along with different environments. And it can be cumbersome to store different ssh connection string in file. So i created this project.
+CharCha is a WebRTC based Video calling web application. It not only used for video calling it also provides peer-to-peer message and file transfering by levaraging Data Channels of WebRTC. for signaling it uses 
+Socket.io with node express server.
 
 ## Built With
-
+Javascript, Nodejs, WebSocket, WebRTC
 ## Setup & Installation
-
+- update the `sample.env` to create your own `.env` file <br/>
+- `cd backend`
+- `npm install`
+- `nodemon`
+- `cd front-end/app`
+- `npm install`
+- `npm run dev`
+  
 ## Author
 * **Dhruv patel** - *Mern stack dev* - [Dhruv patel](https://github.com/dhruv160410116084/) - **
 
