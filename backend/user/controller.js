@@ -10,7 +10,7 @@ class UserController {
             let data = req.body
             console.log(data)
             let user = await pool.query('INSERT INTO users (email,password,username,profile) values ($1,$2,$3,$4) Returning *',[data.email,data.password,data.username,'https://ui-avatars.com/api/?bold=true&background=ffffff&color=000000&name='+data.username])
-            console.log(user)
+            // console.log(user)
             return res.send({success:true,data:user.rows})
         } catch (error) {
             next(error)
@@ -21,7 +21,7 @@ class UserController {
         try {
             let data = req.body
             let user = await pool.query('SELECT * FROM users WHERE email=$1 and password=$2',[data.email,data.password])
-            console.log(user.rows)
+            // console.log(user.rows)
             if(user.rowCount == 1){
                 return res.send({success:true,data:user.rows[0]})
             }
