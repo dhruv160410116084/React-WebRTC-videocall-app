@@ -5,13 +5,14 @@ const cors = require('cors');
 const bodyParser = require('body-parser')
 const app = express();
 const server = createServer(app)
+console.log(process.env.FRONT_URL)
 const io = new Server(server,{
-    cors:['http://localhost:5173',' http://192.168.2.17:5173']
+    cors:['http://localhost:5173',' http://192.168.2.17:5173',process.env.FRONT_URL]
 })
 app.use(bodyParser.json())
 
 app.use(cors({
-    origin: ['http://192.168.2.17:5173', 'http://localhost:80','http://localhost:5173']
+    origin: ['http://192.168.2.17:5173', 'http://localhost:80','http://localhost:5173',process.env.FRONT_URL]
 }))
 
 const userRouter = require('./user/routes');
