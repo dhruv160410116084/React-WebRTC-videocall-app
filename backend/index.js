@@ -18,7 +18,7 @@ const userRouter = require('./user/routes');
 const errorHandler = require('./errorHandler');
 
 
-app.use('/user',userRouter)
+app.use('/api/user',userRouter)
 
 // app.use(function(req,res,next){
 //     res.setHeader('Access-Control-Allow-Origin', '*');

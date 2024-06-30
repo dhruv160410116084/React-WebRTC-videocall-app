@@ -131,3 +131,5 @@ dist
 
 package-lock.json
 front-end/app/package-lock.json
+
+*.conf
