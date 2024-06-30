@@ -1,6 +1,8 @@
 {
     "apps" : [{
         "name"   : "charcha",
-        "script" : " --env-file=.env index.js"
+        "script" : "index.js",
+        "interpreter": "node",
+        "interpreter_args": "--env-file=.env"
       }]
 }
