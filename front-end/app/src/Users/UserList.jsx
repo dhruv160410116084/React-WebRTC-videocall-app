@@ -47,7 +47,7 @@ function UserList(props) {
             }).then(async data => {
                 data = await data.json();
                 data = data.map(d => {
-                    console.log(d)
+                    // console.log(d)
                  return {   ...d,userName:d.username}
                 })
                 // console.log(data)

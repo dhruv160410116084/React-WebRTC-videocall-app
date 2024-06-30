@@ -11,19 +11,19 @@ export function Chat(props) {
   let fileInputRef = useRef(null)
   const [file, setFile] = useState(null)
   // const [percentage,setPercentage] = useState(0);
-  console.log(props);
+  // //console.log(props);
 
   let fileReader = new FileReader();
   let offset = 0
   const MAX_BUFFERED_AMOUNT = 16 * 16 * 1024;
 
 //   useEffect(() => {
-// console.log('reloaded by data channel props');
+// //console.log('reloaded by data channel props');
 //   }, [props.dc,props.isOnCall])
 
   function handleSubmit(e) {
     e.preventDefault();
-    console.log(message, props, location.state);
+    //console.log(message, props, location.state);
     if (file) {
       let chunkSize = 16 * 1024
       fileReader.addEventListener('error', err => console.error(error))
@@ -39,10 +39,10 @@ export function Chat(props) {
         user: { socketId: socket.id, userName: location.state.userName, profile: location.state.profile },
       }])
       fileReader.addEventListener('load', e => {
-        console.log('file loaded', e)
+        //console.log('file loaded', e)
         props.dc.send(e.target.result)
         props.dc.onbufferedamountlow = () => {
-          console.log('res start sending afer buffer empty')
+          //console.log('res start sending afer buffer empty')
           if (file && offset < file.size) {
             readSlice(offset);
           }
@@ -61,7 +61,7 @@ export function Chat(props) {
 
       })
       const readSlice = o => {
-        console.log('readSlice ', o);
+        //console.log('readSlice ', o);
         const slice = file.slice(offset, o + chunkSize);
         fileReader.readAsArrayBuffer(slice);
       };
@@ -96,7 +96,7 @@ export function Chat(props) {
   }
 
   function handleFileChange(e) {
-    console.log(e.target.files)
+    //console.log(e.target.files)
     setFile(e.target.files[0])
     setMessage(e.target.files[0].name)
     let msgData = {
@@ -109,7 +109,7 @@ export function Chat(props) {
 
       user: { socketId: socket.id, userName: location.state.userName, profile: location.state.profile },
     };
-    console.log(msgData)
+    //console.log(msgData)
     if (props.dc) {
       props.dc.send(JSON.stringify(msgData))
     

@@ -4,7 +4,7 @@ import FileIcon from './assets/document.svg'
 import { BarLoader } from "react-spinners";
 
 export default function ChatMessage(props) {
-  console.log(props.chatList)
+  // console.log(props.chatList)
  
   function formatBytes(bytes, decimals = 2) {
     if (!+bytes) return '0 Bytes'

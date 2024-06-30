@@ -6,16 +6,16 @@ import { socket } from './socket';
 
 
 export default function IncomingCallToast(props){
-    console.log(props);
+    // console.log(props);
     function handleAcceptCall(e){
-        console.log(e)
+        // console.log(e)
         props.toastProps.closeToast();
         props.makeWebRTCCall(props.userId)
         socket.emit('call-accept',{id:props.userId})
     }
 
     function handleDenyCall(e){
-        console.log(e)
+        // console.log(e)
         socket.emit('deny-call',{id:props.userId})
         props.toastProps.closeToast();
 

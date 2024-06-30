@@ -41,7 +41,7 @@ let receivedSize = 0
   let fileSocketId = null;
   let downloadRef = useRef(null);
 
-console.log('fileName: --------------------',fileName)
+// console.log('fileName: --------------------',fileName)
 
   useEffect(() => {
     handleVideo();
@@ -54,18 +54,18 @@ console.log('fileName: --------------------',fileName)
   useEffect(() => {
     if (dataChannel) {
       dataChannel.onmessage = (event) => {
-        console.log('Message received: ', event.data, event.data?.type);
+        // console.log('Message received: ', event.data, event.data?.type);
         try {
           if (event.data?.byteLength) {
             receiveBuffer.push(event.data)
             receivedSize += event.data.byteLength
-            console.log(receivedSize, fileSize)
+            // console.log(receivedSize, fileSize)
             if (receivedSize === fileSize) {
               const received = new Blob(receiveBuffer)
               receiveBuffer = []
               receivedSize = 0
               downloadRef.current.href = URL.createObjectURL(received)
-              console.log(downloadRef.current.href)
+              // console.log(downloadRef.current.href)
               downloadRef.current.download = fileName
               downloadRef.current.click();
               // console.log('before setting list: ',fileName,fileSize)
@@ -86,12 +86,12 @@ console.log('fileName: --------------------',fileName)
           } else {
             let data = JSON.parse(event.data);
             // data = JSON.parse(data.data)
-            console.log('eventtttt', data)
+            // console.log('eventtttt', data)
             if (data?.type === 'file-metadata') {
               fileName = data.name;
               fileSize = data.size
               fileSocketId = data.socketId;
-              console.log(fileName, fileSize, event.data.data)
+              // console.log(fileName, fileSize, event.data.data)
 
 
             } else if(data?.type === 'test'){
@@ -120,18 +120,18 @@ console.log('fileName: --------------------',fileName)
   const setupDataChannel = () => {
     if (dataChannel) {
       dataChannel.onmessage = (event) => {
-        console.log('Message received: ', event.data, event.data?.type);
+        // console.log('Message received: ', event.data, event.data?.type);
         try {
           if (event.data?.byteLength) {
             receiveBuffer.push(event.data)
             receivedSize += event.data.byteLength
-            console.log(receivedSize, fileSize)
+            // console.log(receivedSize, fileSize)
             if (receivedSize === fileSize) {
               const received = new Blob(receiveBuffer)
               receiveBuffer = []
               receivedSize = 0
               downloadRef.current.href = URL.createObjectURL(received)
-              console.log(downloadRef.current.href)
+              // console.log(downloadRef.current.href)
               downloadRef.current.download = fileName
               downloadRef.current.click();
               let _fileName = fileName;
@@ -151,12 +151,12 @@ console.log('fileName: --------------------',fileName)
           } else {
             let data = JSON.parse(event.data);
             // data = JSON.parse(data.data)
-            console.log('eventtttt', data)
+            // console.log('eventtttt', data)
             if (data?.type === 'file-metadata') {
               fileName = data.name;
               fileSize = data.size
               fileSocketId = data.socketId;
-              console.log(fileName, fileSize, event.data.data)
+              // console.log(fileName, fileSize, event.data.data)
 
 
             } else if(data?.type === 'test'){
@@ -226,7 +226,7 @@ console.log('fileName: --------------------',fileName)
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
         remoteSocketId = message.sender;
-        console.log('in offer setting channel---');
+        // console.log('in offer setting channel---');
         pc.ondatachannel = (event) => {
           dataChannel = event.channel
           setupDataChannel();
@@ -314,6 +314,7 @@ console.log('fileName: --------------------',fileName)
 
   const cleanup = () => {
     setIsOnCall(false);
+    setChatList([])
     if (pc) {
       pc.close();
       pc = null;

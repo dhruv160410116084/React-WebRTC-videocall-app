@@ -37,7 +37,7 @@ export default function MediaControl({ cleanup, localStream, handleVideo, pc, cl
   const handleCamera = async () => {
     try {
       // debugger
-      console.log('handle camera',isCamOn)
+      // console.log('handle camera',isCamOn)
       const videoTracks = localStream?.getVideoTracks();
       if (!isCamOn) {
         // Turning the camera on
@@ -45,7 +45,7 @@ export default function MediaControl({ cleanup, localStream, handleVideo, pc, cl
         CameraIconRef.current.src = CameraOnIcon;
 
         if (localStream && pc) {
-          console.log('tracks added')  
+          // console.log('tracks added')  
           // localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
           // if(pc){
           // [pc,remotePc].forEach(p => {
@@ -94,7 +94,7 @@ export default function MediaControl({ cleanup, localStream, handleVideo, pc, cl
   const handleMicrophone = () => {
     MicrophoneIconRef.current.src = isMicOn ? MicrophoneOffIcon : MicrophoneOnIcon;
     const audioTracks = localStream?.getAudioTracks();
-    console.log(audioTracks)
+    // console.log(audioTracks)
     audioTracks.forEach(track => {
       track.enabled = !isMicOn;
     });
@@ -106,7 +106,7 @@ export default function MediaControl({ cleanup, localStream, handleVideo, pc, cl
   const handleCameraStreamChange = async (e) =>{
    await handleVideo(e.target.value,isMicOn)
 
-    console.log(e.target.value)
+    // console.log(e.target.value)
     setCamera(e.target.value)
   //  let stream = await playVideoFromCamera(e.target.value)
   }
