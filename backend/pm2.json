@@ -1,0 +1,6 @@
+{
+    "apps" : [{
+        "name"   : "charcha",
+        "script" : "index.js"
+      }]
+}
