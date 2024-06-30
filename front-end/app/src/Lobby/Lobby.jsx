@@ -68,12 +68,14 @@ console.log('fileName: --------------------',fileName)
               console.log(downloadRef.current.href)
               downloadRef.current.download = fileName
               downloadRef.current.click();
-
+              // console.log('before setting list: ',fileName,fileSize)
+              let _fileName = fileName;
+              let _fileSize = fileSize
               setChatList((prevChatList) => [...prevChatList, {
                 type: 'file-metadata',
                 user: { socketId: fileSocketId },
-                fileName: fileName,
-                fileSize: fileSize,
+                fileName: _fileName,
+                fileSize: _fileSize,
                 time: new Date()
               }])
               fileName = null;
@@ -132,12 +134,13 @@ console.log('fileName: --------------------',fileName)
               console.log(downloadRef.current.href)
               downloadRef.current.download = fileName
               downloadRef.current.click();
-
+              let _fileName = fileName;
+              let _fileSize = fileSize
               setChatList((prevChatList) => [...prevChatList, {
                 type: 'file-metadata',
                 user: { socketId: fileSocketId },
-                fileName: fileName,
-                fileSize: fileSize,
+                fileName: _fileName,
+                fileSize: _fileSize,
                 time: new Date()
               }])
               fileName = null;

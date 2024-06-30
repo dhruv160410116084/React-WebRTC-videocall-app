@@ -109,7 +109,7 @@ export function Chat(props) {
         fileName: e.target.files[0].name,
         fileSize: e.target.files[0].size,
         socketId: socket.id,
-  
+        time:new Date(),
         user: { socketId: socket.id, userName: location.state.userName, profile: location.state.profile },
       }])
 
