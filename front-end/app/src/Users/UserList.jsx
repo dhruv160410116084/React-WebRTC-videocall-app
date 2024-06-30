@@ -3,17 +3,19 @@ import User from './User'
 import { io } from 'socket.io-client';
 import { SERVER_URL, socket } from '../socket';
 // import { socket } from '../socket';
+import {SyncLoader} from 'react-spinners'
 
 function UserList(props) {
 
     
     const [tab, setTab] = useState(1)
     const [allUsers, setAllUsersList] = useState([])
-
+    const [isLoading,setIsLoading] = useState(false)
 
     useEffect(() => {
         // console.log(props.socket.connected)
         props.socket.emit('get-users');
+        setIsLoading(true)
         props.socket.on('users', function (data) {
 
             // console.log(data)
@@ -23,6 +25,8 @@ function UserList(props) {
             }).filter(v => v.socketId !== socket.id)
             // console.log(data,' refined data')
             props.setUserList(data)
+        setIsLoading(false)
+
         })
     }, [  ])
 
@@ -32,6 +36,7 @@ function UserList(props) {
             setTab(1)
         } else if (e.target.id == '2') {
             setTab(2)
+            setIsLoading(true)
 
             fetch(SERVER_URL+'/user?'+ new URLSearchParams({
                 skip:0,
@@ -48,6 +53,8 @@ function UserList(props) {
                 // console.log(data)
 
                 setAllUsersList(data)
+        setIsLoading(false)
+
             })
 
         }
@@ -72,7 +79,7 @@ function UserList(props) {
                     All Users</div>
             </div>
 
-
+           {isLoading && <SyncLoader color='#06b6d8' size={10} className='text-center my-4'/>} 
             {tab == 1 &&
                 
                 (props.userList.length > 0 ? props.userList.map(u => {

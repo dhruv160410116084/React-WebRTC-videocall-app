@@ -18,6 +18,7 @@ let remotePc = null;
 let remoteSocketId = null;
 let dataChannel = null;
 
+
 export default function Lobby(props) {
   const videoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -31,12 +32,16 @@ export default function Lobby(props) {
   const callToastRef = useRef(null);
   const [isOnCall, setIsOnCall] = useState(false);
   const [chatList, setChatList] = useState([]);
+
   let fileName = null;
-  let fileSize = 0;
+let fileSize = 0;
+let receiveBuffer = [];
+let receivedSize = 0
+
   let fileSocketId = null;
   let downloadRef = useRef(null);
-  let receiveBuffer = [];
-  let receivedSize = 0
+
+console.log('fileName: --------------------',fileName)
 
   useEffect(() => {
     handleVideo();
@@ -65,7 +70,7 @@ export default function Lobby(props) {
               downloadRef.current.click();
 
               setChatList((prevChatList) => [...prevChatList, {
-                type: 'file',
+                type: 'file-metadata',
                 user: { socketId: fileSocketId },
                 fileName: fileName,
                 fileSize: fileSize,
@@ -87,7 +92,9 @@ export default function Lobby(props) {
               console.log(fileName, fileSize, event.data.data)
 
 
-            } else {
+            } else if(data?.type === 'test'){
+              console.log('test')
+          } else {
               setChatList((prevChatList) => [...prevChatList, data]);
 
             }
@@ -101,6 +108,8 @@ export default function Lobby(props) {
       dataChannel.onopen = () => {
         if (dataChannel.readyState === 'open') {
           console.log("Data channel is open");
+          dataChannel.send(JSON.stringify({type:'test'}))
+
         }
       };
     }
@@ -125,7 +134,7 @@ export default function Lobby(props) {
               downloadRef.current.click();
 
               setChatList((prevChatList) => [...prevChatList, {
-                type: 'file',
+                type: 'file-metadata',
                 user: { socketId: fileSocketId },
                 fileName: fileName,
                 fileSize: fileSize,
@@ -147,7 +156,9 @@ export default function Lobby(props) {
               console.log(fileName, fileSize, event.data.data)
 
 
-            } else {
+            } else if(data?.type === 'test'){
+                console.log('test')
+            }else {
               setChatList((prevChatList) => [...prevChatList, data]);
 
             }
@@ -216,6 +227,8 @@ export default function Lobby(props) {
         pc.ondatachannel = (event) => {
           dataChannel = event.channel
           setupDataChannel();
+          dataChannel.send(JSON.stringify({type:'test'}))
+
 
         }
 
@@ -302,6 +315,10 @@ export default function Lobby(props) {
       pc.close();
       pc = null;
     }
+
+    if(dataChannel){
+      dataChannel.close();
+    }
     socket.off('offer');
     socket.off('answer');
     socket.off('candidate');
@@ -317,9 +334,9 @@ export default function Lobby(props) {
       <div className={`w-3/5 flex flex-col justify-center bg-gray-200 ${isOnCall && 'relative'}`}>
         <video autoPlay playsInline ref={remoteVideoRef} className={`${!isOnCall ? 'hidden' : ''} w-full h-full`} />
         <video ref={videoRef} autoPlay playsInline style={{ display: isCamOn ? 'block' : 'none' }} muted className={`${isOnCall ? 'absolute top-0 right-0 h-1/5 rounded-bl-lg border-2 border border-indigo-600' : 'h-full w-full'}`} />
-        <img src={'https://avatar.iran.liara.run/public/boy?username=' + location.state.username} style={{ display: !isCamOn ? 'block' : 'none' }} className="w-full h-full object-cover" />
+        <img src={ location.state.profile} style={{ display: !isCamOn ? 'block' : 'none' }} className="w-full h-full object-cover" />
       </div>
-      <Chat dc={dataChannel} chatList={chatList} setChatList={setChatList} />
+      {isOnCall && <Chat dc={dataChannel} chatList={chatList} setChatList={setChatList} isOnCall={isOnCall}/>}
     </div>
   
     <div className="self-center absolute bottom-0">

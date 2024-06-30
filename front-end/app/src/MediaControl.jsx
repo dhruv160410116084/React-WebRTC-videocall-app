@@ -118,7 +118,7 @@ export default function MediaControl({ cleanup, localStream, handleVideo, pc, cl
 
   return (
     <div className={`m-3 p-3 bg-slate-300 w-fit rounded-lg flex flex-row ${className}`}>
-      <button className='bg-gray-400 hover:bg-cyan-400 mx-1' onClick={handleCamera}>
+      <button className='bg-gray-400 hover:hover:bg-indigo-300 mx-1' onClick={handleCamera}>
         <img className='h-5' src={CameraOnIcon} ref={CameraIconRef} alt="Camera Toggle" />
       </button>
       <select name="camera" id="camera-list" value={camera?.deviceId}  onChange={handleCameraStreamChange}>
@@ -128,7 +128,7 @@ export default function MediaControl({ cleanup, localStream, handleVideo, pc, cl
           </option>
         ))}
       </select>
-      <button className='bg-gray-400 hover:bg-cyan-400 mx-1' onClick={handleMicrophone}>
+      <button className='bg-gray-400 hover:hover:bg-indigo-300 mx-1' onClick={handleMicrophone}>
         <img className='h-5' src={MicrophoneOnIcon} alt="Microphone Toggle" ref={MicrophoneIconRef} />
       </button>
       {

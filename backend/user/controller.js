@@ -9,7 +9,7 @@ class UserController {
         try {
             let data = req.body
             console.log(data)
-            let user = await pool.query('INSERT INTO users (email,password,username,profile) values ($1,$2,$3,$4) Returning *',[data.email,data.password,data.username,'https://avatar.iran.liara.run/public/boy?username='+data.username])
+            let user = await pool.query('INSERT INTO users (email,password,username,profile) values ($1,$2,$3,$4) Returning *',[data.email,data.password,data.username,'https://ui-avatars.com/api/?bold=true&background=ffffff&color=000000&name='+data.username])
             console.log(user)
             return res.send({success:true,data:user.rows})
         } catch (error) {

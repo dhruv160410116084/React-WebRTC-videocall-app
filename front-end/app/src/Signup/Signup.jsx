@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { playVideoFromCamera } from '../helper/webrtc';
 import TeaIcon from '../assets/teaIcon.gif'
 import { SERVER_URL } from '../socket';
+import { ToastContainer, toast } from 'react-toastify';
 
 
 
@@ -51,6 +52,11 @@ export default function Signup(props) {
         
         if(data.success){
             navigator('/')
+        }else{
+            if(data.data)
+                toast(data.data)
+            else 
+                toast(data.message)
         }
     }
 
@@ -126,6 +132,8 @@ export default function Signup(props) {
             <div className="mt-4">
                 Already a user? <a href="/login" className="text-indigo-500 hover:underline">Hop In</a>
             </div>
+            <ToastContainer />
+
         </div>
 
 

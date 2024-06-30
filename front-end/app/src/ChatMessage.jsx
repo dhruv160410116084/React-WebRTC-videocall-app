@@ -23,7 +23,7 @@ export default function ChatMessage(props) {
         return ( <div key={i} style={{ maxWidth: '80%' }} className={`${socket.id == m.user.socketId ? 'self-end ' : 'self-start '}`}>
           {socket.id !== m.user.socketId && <h2 className="text-start text-sm font-semibold -my-1">{m.user.userName}</h2>}
           <li className={`px-2 py-1 my-1 ${socket.id == m.user.socketId ? ' bg-slate-600 rounded text-white' : ' bg-indigo-600 rounded text-white'}`}>
-            {m.type=== 'file'?
+            {m.type=== 'file-metadata'?
             <div className="flex flex-row"> <img className="mx-1" height={22} width={22} src={FileIcon} alt="File" />
             <div>
             {m.fileName}  

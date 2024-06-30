@@ -10,7 +10,7 @@ export default function User(props) {
     }
     return (
         <div key={props.data.socketId}
-            className={`flex flex-row p-2 px-4 hover:bg-slate-400  hover:text-white justify-between`  }
+            className={`flex flex-row p-2 px-4 hover:bg-indigo-300  hover:text-white justify-between`  }
            >
             <div className='flex flex-row'>
             <img src={props.data.profile} className='h-10'></img>
