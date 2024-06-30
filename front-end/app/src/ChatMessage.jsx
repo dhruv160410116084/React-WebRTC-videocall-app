@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { socket } from "./socket";
 import FileIcon from './assets/document.svg'
+import { BarLoader } from "react-spinners";
 
 export default function ChatMessage(props) {
   console.log(props.chatList)
+ 
   function formatBytes(bytes, decimals = 2) {
     if (!+bytes) return '0 Bytes'
 
@@ -26,8 +28,10 @@ export default function ChatMessage(props) {
             {m.type=== 'file-metadata'?
             <div className="flex flex-row"> <img className="mx-1" height={22} width={22} src={FileIcon} alt="File" />
             <div>
-            {m.fileName}  
-            <h6 className="text-xs text-gray-300">{formatBytes( m.fileSize)}</h6>
+            {m.fileName}    
+            {/* <BarLoader color="#06b6d8" />   */}
+            {/* <div className="text-xs font-bold text-gray-300 text-left">{percentage}%</div> */}
+            <h6 className="text-xs text-gray-300 text-right">{formatBytes( m.fileSize)}</h6>
             </div>
           
              </div> 

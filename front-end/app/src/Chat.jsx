@@ -10,6 +10,7 @@ export function Chat(props) {
   const location = useLocation();
   let fileInputRef = useRef(null)
   const [file, setFile] = useState(null)
+  // const [percentage,setPercentage] = useState(0);
   console.log(props);
 
   let fileReader = new FileReader();
@@ -27,7 +28,16 @@ export function Chat(props) {
       let chunkSize = 16 * 1024
       fileReader.addEventListener('error', err => console.error(error))
       fileReader.addEventListener('abort', err => console.error(error))
-
+      props.setChatList((prevChatList) => [...prevChatList, {
+        message: message,
+        type: 'file-metadata',
+  
+        fileName: file.name,
+        fileSize:file.size,
+        socketId: socket.id,
+        time:new Date(),
+        user: { socketId: socket.id, userName: location.state.userName, profile: location.state.profile },
+      }])
       fileReader.addEventListener('load', e => {
         console.log('file loaded', e)
         props.dc.send(e.target.result)
@@ -102,16 +112,7 @@ export function Chat(props) {
     console.log(msgData)
     if (props.dc) {
       props.dc.send(JSON.stringify(msgData))
-      props.setChatList((prevChatList) => [...prevChatList, {
-        message: message,
-        type: 'file-metadata',
-  
-        fileName: e.target.files[0].name,
-        fileSize: e.target.files[0].size,
-        socketId: socket.id,
-        time:new Date(),
-        user: { socketId: socket.id, userName: location.state.userName, profile: location.state.profile },
-      }])
+    
 
     }
   }
