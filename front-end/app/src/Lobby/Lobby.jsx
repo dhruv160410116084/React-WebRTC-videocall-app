@@ -359,8 +359,8 @@ let receivedSize = 0
         <UserList className="text-left" socket={socket} makeCall={makeCall} userList={userList} setUserList={setUserList} />
       </div>
       <div className={`w-3/5 flex flex-col justify-center bg-gray-200 ${isOnCall && 'relative'}`}>
-        <video autoPlay playsInline ref={remoteVideoRef} className={`${!isOnCall ? 'hidden' : ''} w-full h-full`} />
-        <video ref={videoRef} autoPlay playsInline style={{ display: isCamOn ? 'block' : 'none' }} muted className={`${isOnCall ? 'absolute top-0 right-0 h-1/5 rounded-bl-lg border-2 border border-indigo-600' : 'h-full w-full'}`} />
+        <video autoPlay playsInline ref={remoteVideoRef} className={`${!isOnCall ? 'hidden' : ''} w-full h-full`} style={{transform: scaleX(-1)}} />
+        <video ref={videoRef} autoPlay playsInline style={{ display: isCamOn ? 'block' : 'none' , transform: scaleX(-1) }} muted className={`${isOnCall ? 'absolute top-0 right-0 h-1/5 rounded-bl-lg border-2 border border-indigo-600' : 'h-full w-full'}`} />
         <img src={ location.state.profile} style={{ display: !isCamOn ? 'block' : 'none' }} className={` object-cover ${isOnCall? 'absolute top-0 right-0 h-1/5' : "w-full h-full"}`} />
       </div>
       {isOnCall && <Chat dc={dataChannel} chatList={chatList} setChatList={setChatList} isOnCall={isOnCall}/>}
