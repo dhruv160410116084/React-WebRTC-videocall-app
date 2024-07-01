@@ -75,11 +75,13 @@ export function Chat(props) {
         user: { socketId: socket.id, userName: location.state.userName, profile: location.state.profile },
       };
 
-      if (props.dc && props.dc.readyState === 'open') {
+      if (message.length>0 && props.dc && props.dc.readyState === 'open') {
+        // console.log(message)
         props.dc.send(JSON.stringify(msgData));
+        props.setChatList((prevChatList) => [...prevChatList, msgData]);
+
       }
 
-      props.setChatList((prevChatList) => [...prevChatList, msgData]);
     }
 
     setMessage("");
