@@ -110,6 +110,7 @@ export default function Signup(props) {
                     className="border-2 border-black m-2 p-2"
                     placeholder="Enter your password"
                     value={password}
+                    maxLength={8}
                     onChange={handleUserName}
                 />
 
@@ -119,6 +120,8 @@ export default function Signup(props) {
                     className="border-2 border-black m-2 p-2"
                     placeholder="Confirm password"
                     value={cpassword}
+                    maxLength={8}
+
                     onChange={handleUserName}
                 />
                 <button

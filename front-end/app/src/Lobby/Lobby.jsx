@@ -42,6 +42,7 @@ let receivedSize = 0
   let downloadRef = useRef(null);
 
 // console.log('fileName: --------------------',fileName)
+// console.log(socket.id);
 
   useEffect(() => {
     handleVideo();
@@ -50,7 +51,7 @@ let receivedSize = 0
       cleanup();
     };
   }, []);
-
+// sender: nYZMuT630gAs3j-ZAAAJ  caller: ajcApQ62q5qVUHb9AAAL
   useEffect(() => {
     if (dataChannel) {
       dataChannel.onmessage = (event) => {
@@ -190,7 +191,7 @@ let receivedSize = 0
     setupDataChannel();
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
-
+    console.log(socket.id);
     socket.emit('offer', { member, offer });
   };
 
@@ -220,6 +221,7 @@ let receivedSize = 0
     socket.emit('user-data', { data: location.state });
 
     socket.on('offer', async message => {
+      console.log('offer received');
       if (message.offer) {
         remotePc = await createConnection();
         await pc.setRemoteDescription(new RTCSessionDescription(message.offer));
@@ -240,6 +242,7 @@ let receivedSize = 0
     });
 
     socket.on('answer', async message => {
+      console.log('answer received')
       if (message.answer && pc) {
         await pc.setRemoteDescription(new RTCSessionDescription(message.answer));
       }
@@ -285,12 +288,29 @@ let receivedSize = 0
       };
 
       pc.ontrack = event => {
+        console.log('on track called',event)
         if (remoteVideoRef.current) {
+          const remoteStream = event.streams[0];
+
+          remoteStream.getTracks().forEach((track) => {
+            track.onmute = ()=>{
+              console.log('on mute');
+            }
+            track.onunmute = ()=>{
+              console.log('unmute');
+            }
+          });
+
+         
+
+        
+          console.log('tracks comming')
           remoteVideoRef.current.srcObject = event.streams[0];
         }
       };
 
       pc.onconnectionstatechange = () => {
+        console.log(pc)
         if (pc.connectionState === 'connected') {
           setIsOnCall(true);
         } else if (pc.connectionState === 'disconnected') {
@@ -313,6 +333,11 @@ let receivedSize = 0
   };
 
   const cleanup = () => {
+    remotePc=null
+    remoteSocketId = null;
+    dataChannel = null;
+    setPcState(null)
+    
     setIsOnCall(false);
     setChatList([])
     if (pc) {
@@ -323,9 +348,7 @@ let receivedSize = 0
     if(dataChannel){
       dataChannel.close();
     }
-    socket.off('offer');
-    socket.off('answer');
-    socket.off('candidate');
+    
   };
 
   return (
@@ -338,7 +361,7 @@ let receivedSize = 0
       <div className={`w-3/5 flex flex-col justify-center bg-gray-200 ${isOnCall && 'relative'}`}>
         <video autoPlay playsInline ref={remoteVideoRef} className={`${!isOnCall ? 'hidden' : ''} w-full h-full`} />
         <video ref={videoRef} autoPlay playsInline style={{ display: isCamOn ? 'block' : 'none' }} muted className={`${isOnCall ? 'absolute top-0 right-0 h-1/5 rounded-bl-lg border-2 border border-indigo-600' : 'h-full w-full'}`} />
-        <img src={ location.state.profile} style={{ display: !isCamOn ? 'block' : 'none' }} className="w-full h-full object-cover" />
+        <img src={ location.state.profile} style={{ display: !isCamOn ? 'block' : 'none' }} className={` object-cover ${isOnCall? 'absolute top-0 right-0 h-1/5' : "w-full h-full"}`} />
       </div>
       {isOnCall && <Chat dc={dataChannel} chatList={chatList} setChatList={setChatList} isOnCall={isOnCall}/>}
     </div>

@@ -44,7 +44,7 @@ io.on("connection", (socket) => {
       })
   
       socket.on('offer', (data) => {
-        console.log("offer ",data)
+        console.log("offer ",data.member)
         // socket.broadcast.emit('offer', data)
         data.sender = socket.id
         io.to(data.member).emit('offer', data)
@@ -52,7 +52,7 @@ io.on("connection", (socket) => {
   
       socket.on('answer', (data) => {
         // socket.broadcast.emit('answer', data)
-        console.log('answer: -------------------- ', data)
+        console.log('answer: -------------------- ', data.receiver)
         io.to(data.receiver).emit('answer', data)
       })
   

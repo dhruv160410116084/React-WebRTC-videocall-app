@@ -80,7 +80,7 @@ export default function Login() {
             <h1 className='m-2 text-black'>CharCha</h1> <img src={TeaIcon} alt="" className='h-16'/>
 
             </div>
-        <h1 className="m-2 text-xl text-black font-bold">Sign up</h1>
+        <h1 className="m-2 text-xl text-black font-bold">Hop In</h1>
 
             {/* <img src={meetingLogo} alt="" width={50} height={20} />     */}
             {/* </div> */}
@@ -106,6 +106,7 @@ export default function Login() {
             className="border-2 border-black m-2 p-2" 
             placeholder="Enter your password" 
             value={password} 
+            maxLength={8}
             onChange={handleUserName} />
 
             <button className="bg-indigo-500 text-white m-2" onClick={submitUser}> Enter</button>
