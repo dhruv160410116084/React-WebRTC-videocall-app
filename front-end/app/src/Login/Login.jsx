@@ -22,7 +22,8 @@ export default function Login() {
         // alert(query)
         e.preventDefault()
         console.log(userName,password,email)
-        let data = await fetch('/api/user/login',{
+        let data = await fetch(window.location.host+':3000/api/user/login',{
+            
             method: 'POST',
             headers:{
                 'Content-Type':'application/json',
