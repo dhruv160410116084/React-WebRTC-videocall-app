@@ -33,7 +33,7 @@ export default function Lobby(props) {
   const [isOnCall, setIsOnCall] = useState(false);
   const [chatList, setChatList] = useState([]);
 
-  let fileName = null;
+let fileName = null;
 let fileSize = 0;
 let receiveBuffer = [];
 let receivedSize = 0
