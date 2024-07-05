@@ -11,9 +11,11 @@ const io = new Server(server,{
 })
 app.use(bodyParser.json())
 
-app.use(cors({
-    origin: ['http://192.168.2.17:5173', 'http://localhost:80','http://localhost:5173',process.env.FRONT_URL]
-}))
+// app.use(cors({
+//     origin: ['http://192.168.2.17:5173', 'http://localhost:80','http://localhost:5173',process.env.FRONT_URL]
+// }))
+
+app.use(cors())
 
 const userRouter = require('./user/routes');
 const errorHandler = require('./errorHandler');
