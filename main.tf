@@ -43,7 +43,7 @@ resource "aws_security_group" "web_sg" {
 
 resource "aws_launch_configuration" "mern_lc" {
   name_prefix          = "mern-lc-"
-  image_id             = "ami-06c68f701d8090592"
+  image_id             = "ami-06c68f701d8090592"  
   instance_type        = "t2.micro"
   security_groups      = [aws_security_group.web_sg.id]
   user_data            = file("./user-data.sh")
