@@ -33,6 +33,13 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -46,7 +53,8 @@ resource "aws_launch_configuration" "mern_lc" {
   image_id             = "ami-08c23e5c67921a75c"  
   instance_type        = "t2.micro"
   security_groups      = [aws_security_group.web_sg.id]
-  user_data            = file("./user-data.sh")
+  key_name             = "dh-local"
+
 
   lifecycle {
     create_before_destroy = true
@@ -71,6 +79,10 @@ resource "aws_sqs_queue" "terraform_queue" {
   tags = {
     Environment = "production"
   }
+}
+
+output "sqs_queue_url" {
+  value = aws_sqs_queue.terraform_queue.id
 }
 
 data "aws_iam_policy_document" "sqs_policy" {
