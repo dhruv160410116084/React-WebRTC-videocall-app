@@ -2,11 +2,24 @@ pipeline {
     agent any
     
  
-  
-    // environment {
-    //     key = credentials('ssh-aws').privateKey
-    // }
+    parameters {
+        string(name: 'json', defaultValue: '{}', description: 'Webhook payload')
+    }
+
+    environment {
+        INSTANCE_ID = "NULL"
+        EVENT = "NULL"
+    }
+
     stages {
+        stage("Process the webhook"){
+            steps {
+                script {
+                      def payload = readJSON text: params.json
+                      echo "Received payload: ${payload}"
+                }
+            }
+        }
         
         stage('Add Host Key to known_hosts') {
             steps {
