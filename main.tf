@@ -43,7 +43,7 @@ resource "aws_security_group" "web_sg" {
 
 resource "aws_launch_configuration" "mern_lc" {
   name_prefix          = "mern-lc-"
-  image_id             = "ami-06c68f701d8090592"  
+  image_id             = "ami-08c23e5c67921a75c"  
   instance_type        = "t2.micro"
   security_groups      = [aws_security_group.web_sg.id]
   user_data            = file("./user-data.sh")
@@ -51,6 +51,66 @@ resource "aws_launch_configuration" "mern_lc" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_sns_topic" "sns_topic" {
+  name = "notifier"
+}
+
+resource "aws_sqs_queue" "terraform_queue" {
+  name                      = "terraform-queue"
+  visibility_timeout_seconds= 90
+  delay_seconds             = 0
+  max_message_size          = 2048
+  message_retention_seconds = 86400
+  receive_wait_time_seconds = 5
+  sqs_managed_sse_enabled   = false
+ 
+
+
+  tags = {
+    Environment = "production"
+  }
+}
+
+data "aws_iam_policy_document" "sqs_policy" {
+  statement {
+    sid    = "__owner_statement"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["785997096043"]
+    }
+
+    actions   = ["sqs:*"]
+    resources = [aws_sqs_queue.terraform_queue.arn]
+  }
+
+  statement {
+    sid    = "__receiver_statement"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::785997096043:role/pipeline"]
+    }
+
+    actions   = ["sqs:ChangeMessageVisibility","sqs:DeleteMessage","sqs:ReceiveMessage"]
+    resources = [aws_sqs_queue.terraform_queue.arn]
+  }
+}
+
+resource "aws_sqs_queue_policy" "test" {
+  queue_url = aws_sqs_queue.terraform_queue.id
+  policy    = data.aws_iam_policy_document.sqs_policy.json
+}
+
+
+resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
+  topic_arn = aws_sns_topic.sns_topic.arn
+  protocol  = "sqs"
+  endpoint  = aws_sqs_queue.terraform_queue.arn
 }
 
 resource "aws_autoscaling_group" "mern_asg" {

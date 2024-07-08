@@ -8,7 +8,7 @@ pipeline {
     // }
     stages {
         
-             stage('Add Host Key to known_hosts') {
+        stage('Add Host Key to known_hosts') {
             steps {
                 script {
                     // Ensure the use of Bash and add the host key to known_hosts
@@ -42,11 +42,22 @@ pipeline {
                     sh '''
                    
                     echo $MY_SSH_KEY
-                    ssh -i $MY_SSH_KEY ec2-user@44.202.22.202 "ls -al"
+                    ssh -i $MY_SSH_KEY ubuntu@44.202.22.202 "ls -al"
                     '''
                 } 
                 }
                
+            }
+        }
+
+        stage('Connect to Instance') {
+            steps {
+                script {
+                    // Use the AWS CLI to get the public IP address of the new instance
+                    def instanceInfo = sh(script: "aws ec2 describe-instances --instance-ids i-0551a796c66ef4259 --query 'Reservations[0].Instances[0].PublicIpAddress' --output text", returnStdout: true).trim()
+                    
+                    echo "Instance IP: ${instanceInfo}"
+                }
             }
         }
     }
