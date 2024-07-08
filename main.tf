@@ -99,6 +99,24 @@ data "aws_iam_policy_document" "sqs_policy" {
     actions   = ["sqs:ChangeMessageVisibility","sqs:DeleteMessage","sqs:ReceiveMessage"]
     resources = [aws_sqs_queue.terraform_queue.arn]
   }
+
+   statement {
+    sid    = "__sns_statement"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.terraform_queue.arn]
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = [aws_sns_topic.sns_topic.arn]
+    }
+  }
 }
 
 resource "aws_sqs_queue_policy" "test" {
@@ -128,7 +146,24 @@ resource "aws_autoscaling_group" "mern_asg" {
     propagate_at_launch = true
   }
 
+
   target_group_arns = [aws_lb_target_group.frontend_tg.arn, aws_lb_target_group.backend_tg.arn]
+}
+
+resource "aws_autoscaling_notification" "example_notifications" {
+  group_names = [
+  
+    aws_autoscaling_group.mern_asg.name,
+  ]
+
+  notifications = [
+    "autoscaling:EC2_INSTANCE_LAUNCH",
+    # "autoscaling:EC2_INSTANCE_TERMINATE",
+    # "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
+    # "autoscaling:EC2_INSTANCE_TERMINATE_ERROR",
+  ]
+
+  topic_arn = aws_sns_topic.sns_topic.arn
 }
 
 resource "aws_lb" "mern_lb" {
