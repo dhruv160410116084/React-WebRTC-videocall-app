@@ -76,7 +76,7 @@ pipeline {
                         # Transfer .env file to EC2 instance
                     scp -o StrictHostKeyChecking=no -i $MY_SSH_KEY .env ubuntu@$Instance_IP:~/
                     
-                    #ssh -i $MY_SSH_KEY ubuntu@$Instance_IP "git clone https://github.com/dhruv160410116084/React-WebRTC-videocall-app.git && mv .env ./React-WebRTC-videocall-app/backend && cd React-WebRTC-videocall-app && ./start.sh"
+                    ssh -i $MY_SSH_KEY ubuntu@$Instance_IP "git clone https://github.com/dhruv160410116084/React-WebRTC-videocall-app.git && mv .env ./React-WebRTC-videocall-app/backend && cd React-WebRTC-videocall-app && chmod +x start.sh && ./start.sh"
                     '''
                 } 
                 }
