@@ -61,9 +61,9 @@ resource "aws_launch_configuration" "mern_lc" {
   }
 }
 
-resource "aws_sns_topic" "sns_topic" {
-  name = "notifier"
-}
+# resource "aws_sns_topic" "sns_topic" {
+#   name = "notifier"
+# }
 
 resource "aws_sqs_queue" "terraform_queue" {
   name                      = "terraform-queue"
@@ -112,23 +112,23 @@ data "aws_iam_policy_document" "sqs_policy" {
     resources = [aws_sqs_queue.terraform_queue.arn]
   }
 
-   statement {
-    sid    = "__sns_statement"
-    effect = "Allow"
+  #  statement {
+  #   sid    = "__sns_statement"
+  #   effect = "Allow"
 
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
+  #   principals {
+  #     type        = "AWS"
+  #     identifiers = ["*"]
+  #   }
 
-    actions   = ["sqs:SendMessage"]
-    resources = [aws_sqs_queue.terraform_queue.arn]
-    condition {
-      test     = "ArnLike"
-      variable = "aws:SourceArn"
-      values   = [aws_sns_topic.sns_topic.arn]
-    }
-  }
+  #   actions   = ["sqs:SendMessage"]
+  #   resources = [aws_sqs_queue.terraform_queue.arn]
+  #   condition {
+  #     test     = "ArnLike"
+  #     variable = "aws:SourceArn"
+  #     values   = [aws_sns_topic.sns_topic.arn]
+  #   }
+  # }
 }
 
 resource "aws_sqs_queue_policy" "test" {
@@ -137,13 +137,14 @@ resource "aws_sqs_queue_policy" "test" {
 }
 
 
-resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
-  topic_arn = aws_sns_topic.sns_topic.arn
-  protocol  = "sqs"
-  endpoint  = aws_sqs_queue.terraform_queue.arn
-}
+# resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
+#   topic_arn = aws_sns_topic.sns_topic.arn
+#   protocol  = "sqs"
+#   endpoint  = aws_sqs_queue.terraform_queue.arn
+# }
 
 resource "aws_autoscaling_group" "mern_asg" {
+  name                 = "asg"
   desired_capacity     = 1
   max_size             = 3
   min_size             = 1
@@ -158,25 +159,36 @@ resource "aws_autoscaling_group" "mern_asg" {
     propagate_at_launch = true
   }
 
+  initial_lifecycle_hook {
+    name                   = "hook"
+    default_result         = "CONTINUE"
+    heartbeat_timeout      = 2000
+    lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
+
+    notification_target_arn = aws_sqs_queue.terraform_queue.arn
+    role_arn                = "arn:aws:iam::785997096043:role/lifecycle-hook-access"
+
+  }
+
 
   target_group_arns = [aws_lb_target_group.frontend_tg.arn, aws_lb_target_group.backend_tg.arn]
 }
 
-resource "aws_autoscaling_notification" "example_notifications" {
-  group_names = [
+# resource "aws_autoscaling_notification" "example_notifications" {
+#   group_names = [
   
-    aws_autoscaling_group.mern_asg.name,
-  ]
+#     aws_autoscaling_group.mern_asg.name,
+#   ]
 
-  notifications = [
-    "autoscaling:EC2_INSTANCE_LAUNCH",
-    # "autoscaling:EC2_INSTANCE_TERMINATE",
-    # "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
-    # "autoscaling:EC2_INSTANCE_TERMINATE_ERROR",
-  ]
+#   notifications = [
+#     "autoscaling:EC2_INSTANCE_LAUNCH",
+#     # "autoscaling:EC2_INSTANCE_TERMINATE",
+#     # "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
+#     # "autoscaling:EC2_INSTANCE_TERMINATE_ERROR",
+#   ]
 
-  topic_arn = aws_sns_topic.sns_topic.arn
-}
+#   topic_arn = aws_sns_topic.sns_topic.arn
+# }
 
 resource "aws_lb" "mern_lb" {
   name               = "mern-lb"

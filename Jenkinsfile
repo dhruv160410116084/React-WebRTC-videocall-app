@@ -10,11 +10,11 @@ pipeline {
                     echo "Raw SQS Body Parameter: ${params.sqs_body}"
                     
                     // Validate and parse the JSON
-                    def payload = readJSON text: params.sqs_body
-                    payload = readJSON text: payload.Message
+                    def payload = readJSON text: params.sqs_body   
+                    // payload = readJSON text: payload.Message
                     echo "Received payload: ${payload}"
                     env.INSTANCE_ID = payload.EC2InstanceId
-                    env.EVENT = payload.Event
+                    env.EVENT = payload.LifecycleTransition
                     def instanceInfo = sh(script: "aws ec2 describe-instances --instance-ids ${env.INSTANCE_ID} --query 'Reservations[0].Instances[0].PublicIpAddress' --output text", returnStdout: true).trim()
                     
                    echo "Instance IP: ${instanceInfo}"
@@ -27,7 +27,7 @@ pipeline {
         stage('Add Host Key to known_hosts') {
             steps {
                 script {
-                    if (env.EVENT == 'autoscaling:EC2_INSTANCE_LAUNCH') {
+                    if (env.EVENT == 'autoscaling:EC2_INSTANCE_LAUNCHING') {
                         echo 'instance launched'
                         sh """
                         #!/bin/bash
