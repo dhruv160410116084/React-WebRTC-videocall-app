@@ -151,7 +151,7 @@ resource "aws_autoscaling_group" "mern_asg" {
   vpc_zone_identifier  = data.aws_subnets.default.ids
   launch_configuration = aws_launch_configuration.mern_lc.id
   health_check_type    = "EC2"
-  health_check_grace_period = 300
+  health_check_grace_period = 3000
 
   tag {
     key                 = "Name"
@@ -159,19 +159,31 @@ resource "aws_autoscaling_group" "mern_asg" {
     propagate_at_launch = true
   }
 
-  initial_lifecycle_hook {
-    name                   = "hook"
-    default_result         = "CONTINUE"
-    heartbeat_timeout      = 2000
-    lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
+  # initial_lifecycle_hook {
+  #   name                   = "hook"
+  #   default_result         = "CONTINUE"
+  #   heartbeat_timeout      = 2000
+  #   lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
 
-    notification_target_arn = aws_sqs_queue.terraform_queue.arn
-    role_arn                = "arn:aws:iam::785997096043:role/lifecycle-hook-access"
+  #   notification_target_arn = aws_sqs_queue.terraform_queue.arn
+  #   role_arn                = "arn:aws:iam::785997096043:role/lifecycle-hook-access"
 
-  }
+  # }
 
 
   target_group_arns = [aws_lb_target_group.frontend_tg.arn, aws_lb_target_group.backend_tg.arn]
+}
+
+resource "aws_autoscaling_lifecycle_hook" "hook" {
+  name                   = "hook"
+  autoscaling_group_name = aws_autoscaling_group.mern_asg.name
+  default_result         = "CONTINUE"
+  heartbeat_timeout      = 2000
+  lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
+
+
+  notification_target_arn = aws_sqs_queue.terraform_queue.arn
+  role_arn                = "arn:aws:iam::785997096043:role/lifecycle-hook-access"
 }
 
 # resource "aws_autoscaling_notification" "example_notifications" {
