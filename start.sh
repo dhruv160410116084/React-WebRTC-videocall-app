@@ -1,4 +1,4 @@
-git pull
+
 cd backend
 
 npm i -g pm2
