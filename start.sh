@@ -1,4 +1,4 @@
-
+pwd
 cd backend
 
 npm i -g pm2
