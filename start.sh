@@ -1,5 +1,6 @@
 pwd
-cd backend
+source ~/.nvm/nvm.sh
+cd /home/ubuntu/React-WebRTC-videocall-app
 
 npm i -g pm2
 npm i 
