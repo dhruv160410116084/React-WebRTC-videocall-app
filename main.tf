@@ -14,57 +14,6 @@ data "aws_subnets" "default" {
    
 }
 
-resource "aws_security_group" "web_sg" {
-  name        = "allow_web_traffic"
-  description = "Allow web traffic"
-  vpc_id      = data.aws_vpc.default.id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_launch_configuration" "mern_lc" {
-  name_prefix          = "mern-lc-"
-  image_id             = "ami-08c23e5c67921a75c"  
-  instance_type        = "t2.micro"
-  security_groups      = [aws_security_group.web_sg.id]
-  key_name             = "dh-local"
-
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-# resource "aws_sns_topic" "sns_topic" {
-#   name = "notifier"
-# }
-
 resource "aws_sqs_queue" "terraform_queue" {
   name                      = "terraform-queue"
   visibility_timeout_seconds= 90
@@ -135,6 +84,59 @@ resource "aws_sqs_queue_policy" "test" {
   queue_url = aws_sqs_queue.terraform_queue.id
   policy    = data.aws_iam_policy_document.sqs_policy.json
 }
+
+resource "aws_security_group" "web_sg" {
+  name        = "allow_web_traffic"
+  description = "Allow web traffic"
+  vpc_id      = data.aws_vpc.default.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_launch_configuration" "mern_lc" {
+  name_prefix          = "mern-lc-"
+  image_id             = "ami-08c23e5c67921a75c"  
+  instance_type        = "t2.micro"
+  security_groups      = [aws_security_group.web_sg.id]
+  key_name             = "dh-local"
+
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# resource "aws_sns_topic" "sns_topic" {
+#   name = "notifier"
+# }
+
+
 
 
 # resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
