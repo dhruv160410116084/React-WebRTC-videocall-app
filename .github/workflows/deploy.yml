@@ -28,8 +28,8 @@ jobs:
           AWS_REGION: us-east-1
         run: |
           aws deploy create-deployment \
-            --application-name YourApplicationName \
-            --deployment-group-name YoutubeDemo-DG \
+            --application-name charcha \
+            --deployment-group-name group \
             --deployment-config-name CodeDeployDefault.OneAtATime \
             --description "Deployment from GitHub Actions" \
             --github-location repository=${{ github.repository }},commitId=${{ github.sha }}
