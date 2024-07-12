@@ -217,6 +217,7 @@ resource "aws_lb_target_group" "frontend_tg" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id
+  deregistration_delay = 30
 
   health_check {
     path                = "/"
@@ -235,7 +236,7 @@ resource "aws_lb_target_group" "backend_tg" {
   vpc_id   = data.aws_vpc.default.id
 
   health_check {
-    path                = "/"
+    path                = "/hello"
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
