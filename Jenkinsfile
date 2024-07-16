@@ -1,3 +1,5 @@
+// plugins: AWS SQS trigger Plugin Ve   rsion1.2
+
 def autoCancelled = false
 
 pipeline {
@@ -99,6 +101,7 @@ pipeline {
                             }
 
                               sh "echo ${env.INSTANCE_ID} && aws autoscaling record-lifecycle-action-heartbeat --lifecycle-hook-name hook --auto-scaling-group-name asg --instance-id ${env.INSTANCE_ID}"
+                              sh "aws autoscaling complete-lifecycle-action --lifecycle-action-result CONTINUE --instance-id ${env.INSTANCE_ID} --lifecycle-hook-name hook --auto-scaling-group-name asg"
 
                         } catch (e){
                             if (autoCancelled) {
