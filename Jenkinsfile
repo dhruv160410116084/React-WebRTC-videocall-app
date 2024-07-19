@@ -4,8 +4,6 @@ def autoCancelled = false
 
 pipeline {
     agent any
-
-
     stages {
         stage('Process the webhook'){
             steps {
