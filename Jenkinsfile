@@ -1,4 +1,3 @@
-// plugins: AWS SQS trigger Plugin Ve   rsion1.2
 
 def autoCancelled = false
 
