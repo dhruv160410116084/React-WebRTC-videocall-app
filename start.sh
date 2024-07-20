@@ -1,7 +1,7 @@
 pwd
 source ~/.nvm/nvm.sh
 cd /home/ubuntu/React-WebRTC-videocall-app/backend
-
+git pull
 npm i -g pm2
 npm i 
 #add env
