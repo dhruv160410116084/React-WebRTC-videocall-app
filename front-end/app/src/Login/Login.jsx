@@ -78,7 +78,7 @@ export default function Login() {
             {/* <div className='flex flex-row'> */}
             {/* <h1 className="flex-1 m-2">Hop In</h1> */}
             <div className='flex flex-row'>
-            <h1 className='m-2 text-black'>CharCha v1.1.1</h1> <img src={TeaIcon} alt="" className='h-16'/>
+            <h1 className='m-2 text-black'>CharCha</h1> <img src={TeaIcon} alt="" className='h-16'/>
 
             </div>
         <h1 className="m-2 text-xl text-black font-bold">Hop In</h1>
