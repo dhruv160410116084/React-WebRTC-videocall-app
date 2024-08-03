@@ -101,6 +101,7 @@ pipeline {
                               sh "aws autoscaling complete-lifecycle-action --lifecycle-action-result CONTINUE --instance-id ${env.INSTANCE_ID} --lifecycle-hook-name hook --auto-scaling-group-name asg"
 
                         } catch (e){
+                            
                             if (autoCancelled) {
                                 currentBuild.result = 'SUCCESS'
                                 // return here instead of throwing error to keep the build "green"

@@ -173,7 +173,7 @@ resource "aws_autoscaling_group" "mern_asg" {
 
     notification_target_arn = aws_sqs_queue.terraform_queue.arn
     role_arn                = "arn:aws:iam::785997096043:role/lifecycle-hook-access"
-}
+  }
 
 
   target_group_arns = [aws_lb_target_group.frontend_tg.arn, aws_lb_target_group.backend_tg.arn]
@@ -275,4 +275,62 @@ resource "aws_lb_listener" "backend_listener" {
 
 output "load_balancer_dns" {
   value = aws_lb.mern_lb.dns_name
+}
+
+resource "aws_wafv2_ip_set" "blocked_ip_set" {
+  name               = "blocked-ip-set"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = ["174.88.68.71/32"]
+  description        = "IP set to block specific IP addresses"
+
+  tags = {
+    Name = "Blocked IP Set"
+  }
+}
+
+resource "aws_wafv2_web_acl" "my_web_acl" {
+  name        = "my-web-acl"
+  scope       = "REGIONAL"
+  description = "Web ACL to block specific IP addresses"
+
+  default_action {
+    allow {}
+  }
+
+  rule {
+    name     = "BlockSpecificIP"
+    priority = 1
+
+    action {
+      block {}
+    }
+
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.blocked_ip_set.arn
+      }
+    }
+
+    visibility_config {
+      sampled_requests_enabled  = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "block-specific-ip"
+    }
+  }
+
+  visibility_config {
+    sampled_requests_enabled  = true
+    cloudwatch_metrics_enabled = true
+    metric_name                = "my-web-acl"
+  }
+
+  tags = {
+    Name = "My Web ACL"
+  }
+}
+
+resource "aws_wafv2_web_acl_association" "lb_association" {
+  resource_arn = aws_lb.mern_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.my_web_acl.arn
 }
