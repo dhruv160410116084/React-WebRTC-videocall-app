@@ -22,7 +22,7 @@ export default function Login() {
         // alert(query)
         e.preventDefault()
         console.log(userName,password,email)
-        let data = await fetch('http://'+window.location.host+':3000/api/user/login',{
+        let data = await fetch('https://'+window.location.host+':3000/api/user/login',{
             
             method: 'POST',
             headers:{

@@ -38,7 +38,7 @@ function UserList(props) {
             setTab(2)
             setIsLoading(true)
 
-            fetch('http://'+window.location.host+':3000/api/user?'+ new URLSearchParams({
+            fetch('https://'+window.location.host+':3000/api/user?'+ new URLSearchParams({
                 skip:0,
                 limit:10
             }),{

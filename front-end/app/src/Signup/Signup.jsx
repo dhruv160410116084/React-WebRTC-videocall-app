@@ -34,7 +34,7 @@ export default function Signup(props) {
         // })
 
         //  })
-        let data = await fetch('http://'+window.location.host+':3000/api/user',{
+        let data = await fetch('https://'+window.location.host+':3000/api/user',{
             method: 'POST',
             headers:{
                 'Content-Type':'application/json',
