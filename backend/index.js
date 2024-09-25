@@ -6,6 +6,8 @@ const bodyParser = require('body-parser')
 const app = express();
 const server = createServer(app)
 console.log(process.env.FRONT_URL)
+const dotenv = require('dotenv')
+dotenv.config()
 const io = new Server(server,{
     cors:['http://localhost:5173',' http://192.168.2.17:5173',process.env.FRONT_URL]
 })
